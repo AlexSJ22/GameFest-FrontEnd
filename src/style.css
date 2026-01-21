@@ -56,7 +56,7 @@ body {
 
 .logo {
   filter: contrast(120%) saturate(100%) drop-shadow(0px 0px 10px rgba(173, 33, 15, 0.199));
-  transform: scaleX(-1) scale(2) rotate(-10deg);
+  transform: scaleX(-1) scale(2.5) rotate(-13deg);
 }
 
 .line {
@@ -65,7 +65,7 @@ body {
 
 .navbar {
     position: fixed;
-    background: linear-gradient(to right, rgba(136, 16, 0, 0.918),rgb(0, 0, 0), black);
+    background: linear-gradient(to right, rgba(82, 12, 3, 0.918),rgb(129, 20, 20), rgb(58, 3, 3));
     top: 30px;
     width: 85%;
     transition: 0.4s ease;
@@ -82,7 +82,7 @@ body {
 }
 
 .xxl {
-  font-size: 2.5rem;
+  font-size: 2.1rem;
   background: url(/src/assets/videos/fire.gif);
   background-clip: text;
   color: transparent;
@@ -97,6 +97,7 @@ body {
   position: relative;
   transition: 0.3s ease;
   display: inline-block; 
+  font-weight: 1000;
 }
 
 .enlace:hover {
@@ -123,7 +124,7 @@ body {
 
 .enlace:hover::before {
   opacity: 1;
-  transform: translate(-50%, 10px); 
+  transform: translate(-50%, 5px); 
 }
 
 @theme inline {
