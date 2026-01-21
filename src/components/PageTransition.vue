@@ -17,7 +17,7 @@ const routeTexts = {
 // Escuchar cambios de ruta
 router.beforeEach((to, from, next) => {
   // Solo hacer transición si cambiamos de página (no en la primera carga)
-  if (from.path !== to.path && from.path !== '/') {
+  if (from.path !== to.path && to.path !== "/login") {
     isTransitioning.value = true
     transitionText.value = routeTexts[to.path] || 'Cargando...'
 
@@ -49,7 +49,7 @@ router.beforeEach((to, from, next) => {
       v-if="isTransitioning"
       class="fixed inset-0 z-[200] bg-black flex items-center justify-center"
     >
-      <h2 class="text-5xl md:text-7xl font-bold font-['Pixelify_Sans'] bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent animate-pulse">
+      <h2 class="text-5xl md:text-9xl font-bold font-['Pixelify_Sans'] bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent animate-pulse">
         {{ transitionText }}
       </h2>
     </div>

@@ -4,18 +4,25 @@
     :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'"
   >
     <!-- Logo centrado - Mobile only -->
-    <RouterLink to="/" class="md:hidden absolute left-1/2 -translate-x-1/2">
+    <RouterLink 
+      to="/" 
+      class="md:hidden absolute left-1/2 -translate-x-1/2 z-50" 
+    >
       <img class="logo w-16 h-16" src="../assets/images/logo/logo2.png" alt="Logo">
     </RouterLink>
 
     <!-- Logo y nombre - Desktop only -->
     <RouterLink to="/" class="logoName hidden md:flex items-center gap-4">
-      <img class="logo w-16 h-16 md:w-20 md:h-20" src="../assets/images/logo/logo2.png" alt="Logo">
+<img 
+  class="logo w-16 h-16 md:w-20 md:h-20 transition-all duration-300 hover:scale-110 hover:rotate-[10deg]" 
+  src="../assets/images/logo/logo2.png" 
+  alt="Logo"
+>
       <h1 class="xxl text-xl md:text-2xl font-bold text-black">GameFest</h1>
     </RouterLink>
 
     <!-- Desktop Navigation -->
-    <ul class="hidden md:flex gap-9 text-white items-center">
+    <ul class="hidden lg:gap-9 lg:text-base md:flex gap-5 md:text-xs text-white items-center">
       <li class="enlace">
         <RouterLink to="/">Inicio</RouterLink>
       </li>
@@ -32,7 +39,7 @@
       
       <li>
         <RouterLink to="/login">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 hover:stroke-orange-500 transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 hover:stroke-pink-500 transition-colors">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
           </svg>
         </RouterLink>
@@ -63,7 +70,7 @@
       leave-to-class="opacity-0 -translate-y-4"
     >
       <div v-show="isOpen" class="md:hidden absolute top-full left-1/2 -translate-x-1/2 w-[90%] mt-4 rounded-3xl overflow-hidden shadow-2xl z-40">
-        <div class="bg-gradient-to-b from-red-900/95 to-black/95 backdrop-blur-sm px-6 py-4 space-y-1 border border-red-900/50">
+        <div class="bg-gradient-to-b from-purple-900 to-blue-900 backdrop-blur-sm px-6 py-4 space-y-1 border border-red-900/50 ">
           <RouterLink
             v-for="link in navLinks"
             :key="link.to"
@@ -151,9 +158,5 @@ const closeMenu = () => {
   }
 }
 
-@media (max-width: 768px) {
-  nav {
-    position: relative;
-  }
-}
+
 </style>

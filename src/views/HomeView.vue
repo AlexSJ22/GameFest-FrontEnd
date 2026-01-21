@@ -16,10 +16,10 @@ onMounted(() => {
 <template>
   <div class="relative h-screen overflow-hidden bg-black">
     <NeuralBg 
-      :hue="0" 
+      :hue="240" 
       :saturation="10" 
       :chroma="0.9"
-      class="w-full h-full"
+      class="w-full h-full blur-md"
     />
 
     <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black pointer-events-none"></div>
@@ -31,12 +31,12 @@ onMounted(() => {
           class="inline-block transition-all duration-700 delay-100"
           :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'"
         >
-          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 backdrop-blur-sm">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-red-500/20 border border-blue-100/30 backdrop-blur-sm">
             <span class="relative flex h-2 w-2">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
             </span>
-            <span class="text-orange-400 text-sm font-['Poppins'] font-medium">
+            <span class="text-purple-200 text-sm font-['Poppins'] font-medium">
               Gaming Festival 2026
             </span>
           </div>
@@ -47,14 +47,14 @@ onMounted(() => {
             class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold transition-all duration-700 delay-200"
             :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
           >
-            <span class="block bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent animate-gradient">
+            <span class="block bg-gradient-to-r from-pink-500 via-purple-900 to-pink-500 bg-clip-text text-transparent animate-gradient">
               GameFest
             </span>
           </h1>
         </div>
 
         <div 
-          class="text-gray-300 text-lg sm:text-xl md:text-2xl max-w-2xl mx-auto font-['Poppins'] transition-all duration-700 delay-300"
+          class="text-white text-lg sm:text-xl md:text-2xl max-w-2xl mx-auto font-['Poppins'] transition-all duration-700 delay-300"
           :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
         >
           <p class="mb-4">
@@ -75,7 +75,7 @@ onMounted(() => {
         >
           <RouterLink
             to="/games"
-            class="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-red-600 text-white font-['Poppins'] font-bold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-orange-500/50"
+            class="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-red-600 text-white font-['Poppins'] font-bold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50"
           >
             <span class="relative z-10 flex items-center gap-2">
               Explorar Juegos
@@ -83,7 +83,7 @@ onMounted(() => {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
               </svg>
             </span>
-            <div class="absolute inset-0 bg-gradient-to-r from-orange-600 to-red-700 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-700 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </RouterLink>
 
           <RouterLink

@@ -6,7 +6,7 @@ const props = withDefaults(defineProps<Props>(), {
   coolDownTime: 0.5,
 });
 
-const TEXT_CLASSES = "absolute inset-x-0 top-0 m-auto inline-block w-full bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 bg-clip-text text-transparent";
+const TEXT_CLASSES = "absolute inset-x-0 top-0 m-auto inline-block w-full bg-gradient-to-r from-pink-400 via-purple-400 to-purple-500 bg-clip-text text-transparent";
 
 interface Props {
   class?: string;
