@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import NeuralBg from '@/components/ui/bg-neural/NeuralBg.vue'
+import MorphingText from '@/components/ui/MorphingText.vue'
 
 const isLoaded = ref(false)
 
@@ -17,13 +18,12 @@ onMounted(() => {
     <NeuralBg 
       :hue="0" 
       :saturation="10" 
-      :chroma="0.7"
+      :chroma="0.9"
       class="w-full h-full"
     />
 
     <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black pointer-events-none"></div>
 
-    <!-- Hero Content -->
     <div class="relative z-10 h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div class="max-w-5xl w-full text-center space-y-8">
         
@@ -44,7 +44,7 @@ onMounted(() => {
 
         <div class="space-y-4">
           <h1 
-            class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold  transition-all duration-700 delay-200"
+            class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold transition-all duration-700 delay-200"
             :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
           >
             <span class="block bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent animate-gradient">
@@ -53,16 +53,21 @@ onMounted(() => {
           </h1>
         </div>
 
-        <p 
-          class="text-gray-300 text-lg sm:text-xl md:text-2xl max-w-md mx-auto font-['Poppins'] transition-all duration-700 delay-300"
+        <div 
+          class="text-gray-300 text-lg sm:text-xl md:text-2xl max-w-2xl mx-auto font-['Poppins'] transition-all duration-700 delay-300"
           :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
         >
-          El festival de videojuegos más grande del año.
-          <span class="text-transparent bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text font-semibold">
-            Talleres, charlas, competiciones
-          </span> 
-          y mucho más.
-        </p>
+          <p class="mb-4">
+            El festival de videojuegos más grande del año.
+          </p>
+          
+          <MorphingText 
+            :texts="['Talleres', 'Charlas', 'Competiciones', 'Networking']"
+            :morph-time="1.5"
+            :cool-down-time="0.5"
+            class="!h-12 sm:!h-16 md:!h-20 !text-3xl sm:!text-4xl md:!text-5xl"
+          />
+        </div>
 
         <div 
           class="flex flex-col sm:flex-row gap-4 justify-center items-center transition-all duration-700 delay-500"

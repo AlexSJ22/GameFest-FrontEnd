@@ -65,7 +65,7 @@ body {
 
 .navbar {
     position: fixed;
-    background: linear-gradient(to right, rgba(82, 12, 3, 0.918),rgb(129, 20, 20), rgb(58, 3, 3));
+    background: linear-gradient(to right, rgba(255, 123, 0, 0.918),rgb(129, 20, 20), rgb(255, 136, 0));
     top: 30px;
     width: 85%;
     transition: 0.4s ease;
@@ -77,9 +77,7 @@ body {
     border-radius: 30px;
 }
 
-.navbar:hover {
-  border-bottom: 2px solid rgba(136, 16, 0, 0.918);
-}
+
 
 .xxl {
   font-size: 2.1rem;
@@ -101,7 +99,7 @@ body {
 }
 
 .enlace:hover {
-  color: rgb(255, 115, 0);
+  color: rgb(26, 25, 25);
 }
 
 .enlace::before {
@@ -120,6 +118,7 @@ body {
   opacity: 0;
   transition: 0.5s ease;
   pointer-events: none; 
+  filter: contrast(200%);
 }
 
 .enlace:hover::before {
