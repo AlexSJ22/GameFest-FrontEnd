@@ -1,11 +1,24 @@
-<script setup></script>
+<script setup>
+
+  import Gamecard from './components/gamecard.vue';
+
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+
+<div class="flex jusify-between">
+  <div class="min-h-screen min-w-screen bg-gray-100 flex flex-wrap justify-center6">
+    
+    <div class="bg-white min-w-screen p-4 rounded">
+    <Gamecard
+    />
+    </div>
+    
+
+  </div>
+</div>
+
+
 </template>
 
 <style scoped></style>
