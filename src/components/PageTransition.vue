@@ -17,7 +17,11 @@ const routeTexts = {
 // Escuchar cambios de ruta
 router.beforeEach((to, from, next) => {
   // Solo hacer transición si cambiamos de página (no en la primera carga)
-  if (from.path !== to.path && to.path !== "/login") {
+  if (
+  from.path !== to.path && 
+  to.path !== "/login" && 
+  !to.path.startsWith("/events") 
+) {
     isTransitioning.value = true
     transitionText.value = routeTexts[to.path] || 'Cargando...'
 
