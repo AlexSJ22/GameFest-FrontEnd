@@ -63,7 +63,7 @@ function handlePointerLeave() {
 <template>
   <div
     ref="refElement"
-    class="container-style relative isolate container [aspect-ratio:17/21] w-[520px] transition-transform delay-[var(--delay)] duration-[var(--duration)] ease-[var(--easing)] will-change-transform [contain:layout_style] [perspective:600px]"
+    class="container-style relative isolate container [aspect-ratio:17/21] w-[400px] transition-transform delay-[var(--delay)] duration-[var(--duration)] ease-[var(--easing)] will-change-transform [contain:layout_style] [perspective:600px]"
     @pointermove="handlePointerMove"
     @pointerenter="handlePointerEnter"
     @pointerleave="handlePointerLeave"

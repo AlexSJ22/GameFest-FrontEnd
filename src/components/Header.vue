@@ -22,7 +22,7 @@
     </RouterLink>
 
     <!-- Desktop Navigation -->
-    <ul class="hidden lg:gap-9 lg:text-base md:flex gap-5 md:text-xs text-white items-center">
+    <ul class="hidden lg:gap-9 lg:text-xl md:flex gap-5 md:text-xs text-white items-center">
       <li class="enlace">
         <RouterLink to="/">Inicio</RouterLink>
       </li>

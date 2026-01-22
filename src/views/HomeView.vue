@@ -47,14 +47,14 @@ onMounted(() => {
             class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold transition-all duration-700 delay-200"
             :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
           >
-            <span class="block bg-gradient-to-r from-pink-500 via-purple-900 to-pink-500 bg-clip-text text-transparent animate-gradient">
+            <span class="block bg-gradient-to-r from-violet-700 via-purple-900 to-pink-500 bg-clip-text text-transparent animate-gradient">
               GameFest
             </span>
           </h1>
         </div>
 
         <div 
-          class="text-white text-lg sm:text-xl md:text-2xl max-w-2xl mx-auto font-['Poppins'] transition-all duration-700 delay-300"
+          class="text-white/80 text-lg sm:text-xl md:text-2xl max-w-2xl mx-auto font-['mashiro'] transition-all duration-700 delay-300"
           :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
         >
           <p class="mb-4">
@@ -75,7 +75,7 @@ onMounted(() => {
         >
           <RouterLink
             to="/games"
-            class="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-red-600 text-white font-['Poppins'] font-bold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50"
+            class="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-500 to-purple-800 text-white font-['Poppins'] font-bold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50"
           >
             <span class="relative z-10 flex items-center gap-2">
               Explorar Juegos
@@ -83,7 +83,7 @@ onMounted(() => {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
               </svg>
             </span>
-            <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-700 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-violet-900 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </RouterLink>
 
           <RouterLink

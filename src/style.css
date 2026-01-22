@@ -5,17 +5,60 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+
+@font-face {
+  font-family: 'Chor';
+  src: url('./assets/fonts/Chor-j9M37.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Vondalore';
+  src: url('./assets/fonts/Vondalore-Jp6Kn.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'ItRoughlin';
+  src: url('./assets/fonts/ItRoughlinDemoRegular-7OLqD.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Mashiro';
+  src: url('./assets/fonts/MashiroDemoRegular-V4jyw.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'ItRoughlin';
+  src: url('./assets/fonts/ItRoughlinDemoItalic-wo4Z9.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
   --font-sans: "Poppins", sans-serif;
-
+  --font-chor: 'Chor', sans-serif;
+  --font-mashiro: 'mashiro', sans-serif;
+  --font-vondalore: 'Vondalore', serif;
+  --font-roughlin: 'ItRoughlin', serif;
   --font-pixel: "Pixelify Sans", cursive;
   --font-mona: "Mona Sans", sans-serif;
 }
 
 body {
   background: rgba(0, 0, 0, 0.986);
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 :root {
@@ -72,35 +115,37 @@ body {
 }
 
 .navbar {
-    position: fixed;
-    background: linear-gradient(to right, rgba(145, 33, 250, 0.918),rgb(74, 12, 87), rgb(2, 16, 75));
-    top: 30px;
-    width: 85%;
-    transition: 0.4s ease;
-    transition: 0.4s ease;
-    border-bottom: 2px solid transparent;
-    left: 50%;
-    translate: -50% 0;
-    corner-shape: bevel;
-    border-radius: 30px;
+  position: fixed;
+  background: linear-gradient(to right, rgba(128, 17, 231, 0.918), #691470, rgba(85, 1, 78, 0.733));
+  top: 30px;
+  width: 85%;
+  transition: 0.4s ease;
+  transition: 0.4s ease;
+  border-bottom: 2px solid transparent;
+  left: 50%;
+  translate: -50% 0;
+  border-radius: 10px;
 }
 
 
 
 .xxl {
-  font-size: 2.1rem;
+  font-size: 2.3rem;
   color: transparent;
   color: black;
   background-size: 110%;
   background-position: bottom;
+  font-family: "mashiro", sans-serif;
   filter: contrast(1150%) brightness(0);
 }
 
 .enlace {
-  font-family: "Poppinm", sans-serif;
+  font-family: "Pixelify Sans", sans-serif;
   position: relative;
   transition: 0.3s ease;
-  display: inline-block; 
+  letter-spacing: 2px;
+  color: rgb(255, 255, 255);
+  display: inline-block;
   font-weight: 1000;
 }
 
@@ -109,27 +154,27 @@ body {
 }
 
 .enlace::before {
-  content: ""; 
+  content: "";
   background-image: url('assets/videos/fireList.gif');
-  background-size: contain; 
+  background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  width: 30px;  
+  width: 30px;
   height: 30px;
   position: absolute;
   left: 50%;
-  top: 50%;  
-  transform: translate(-50%, -50%); 
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: -1;
   opacity: 0;
   transition: 0.5s ease;
-  pointer-events: none; 
+  pointer-events: none;
   filter: contrast(200%) hue-rotate(280deg);
 }
 
 .enlace:hover::before {
   opacity: 1;
-  transform: translate(-50%, 5px); 
+  transform: translate(-50%, 5px);
 }
 
 @theme inline {
@@ -208,6 +253,7 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
