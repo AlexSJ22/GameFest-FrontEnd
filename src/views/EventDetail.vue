@@ -1,6 +1,7 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import api from '@/lib/api' // [cite: 48]
 import { 
   AnimatedModal,
   AnimatedModalBody, 
@@ -9,10 +10,15 @@ import {
 } from '@/components/ui/animated-modal'
 
 const props = defineProps({
-  id: String
+  id: String // [cite: 112]
 })
 
 const router = useRouter()
+const event = ref(null)
+const loading = ref(true)
+
+// Absolute path to reach your backend resources
+const IMAGE_BASE_URL = 'http://localhost/GameFest-BackEnd-feat-methodsSQL/gamefest_resources/events/'
 
 const isOpen = computed({
   get: () => true,
@@ -26,17 +32,46 @@ const isOpen = computed({
 const close = () => {
   isOpen.value = false
 }
+
+const fetchEventDetail = async () => {
+  loading.value = true
+  try {
+    const response = await api.get('events.php', {
+      params: { id: props.id }
+    })
+    event.value = response.data
+  } catch (error) {
+    console.error('Error loading event details:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(fetchEventDetail)
+
+const getTipoStyles = (tipo) => {
+  const styles = {
+    taller: 'bg-purple-500/20 border-purple-500/50 text-purple-400',
+    charla: 'bg-blue-500/20 border-blue-500/50 text-blue-400',
+    torneo: 'bg-red-500/20 border-red-500/50 text-red-400',
+    presentacion: 'bg-green-500/20 border-green-500/50 text-green-400',
+    'mesa-redonda': 'bg-orange-500/20 border-orange-500/50 text-orange-400',
+    networking: 'bg-pink-500/20 border-pink-500/50 text-pink-400',
+    exhibicion: 'bg-cyan-500/20 border-cyan-500/50 text-cyan-400',
+    competicion: 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400',
+  }
+  return styles[tipo.toLowerCase()] || 'bg-gray-500/20 border-gray-500/50 text-gray-400'
+}
 </script>
 
 <template>
-  <div>
   <AnimatedModal 
     :open="isOpen" 
     @update:open="isOpen = $event"
     :close-on-esc="true"
   >
     <AnimatedModalBody 
-      class="md:max-w-2xl w-full bg-zinc-900 border border-purple-500/30 shadow-2xl shadow-purple-500/20"
+      class="md:max-w-4xl w-full bg-zinc-900 border border-purple-500/30 shadow-2xl shadow-purple-500/20 overflow-hidden"
       :show-close="false"
       :close-on-outside="true"
       :lock-scroll="true"
@@ -50,53 +85,67 @@ const close = () => {
         </svg>
       </button>
 
-      <AnimatedModalContent class="p-0">
-        <div class="relative h-48 bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 overflow-hidden">
-          <div class="absolute inset-0 flex items-center justify-center text-7xl">
-            <img src="../assets/images/Test/stalin.jpg" alt="">
-          </div>
-        </div>
+      <div v-if="loading" class="p-20 text-center text-purple-500 font-['Pixelify_Sans'] animate-pulse">
+        Cargando detalles del evento...
+      </div>
 
-        <div class="p-6 space-y-4">
-          <h2 class="text-2xl font-bold text-white font-['Pixelify_Sans']">
-            Unreal Engine Workshop
-          </h2>
-
-          <div class="grid grid-cols-2 gap-3 text-sm">
-            <div class="flex items-center gap-2 text-gray-300">
-              <span class="text-purple-400">📅</span>
-              <span>15 Febrero 2025</span>
-            </div>
-            <div class="flex items-center gap-2 text-gray-300">
-              <span class="text-purple-400">⏰</span>
-              <span>18:00 - 22:00</span>
-            </div>
-            <div class="flex items-center gap-2 text-gray-300">
-              <span class="text-purple-400">👥</span>
-              <span>5 plazas libres</span>
-            </div>
-            <div class="flex items-center gap-2 text-gray-300">
-              <span class="text-purple-400">🏷️</span>
-              <span>Workshop</span>
-            </div>
+      <AnimatedModalContent v-else-if="event" class="p-0">
+        <div class="flex flex-col md:flex-row min-h-[450px]">
+          
+          <div class="md:w-2/5 relative h-56 md:h-auto overflow-hidden bg-zinc-800">
+            <img 
+              :src="IMAGE_BASE_URL + event.imagen" 
+              :alt="event.titulo" 
+              class="w-full h-full object-cover opacity-80"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-zinc-900/40 to-transparent"></div>
           </div>
 
-          <div class="pt-2">
-            <p class="text-gray-400 text-sm leading-relaxed font-['Poppins']">
-              Aprende a crear juegos con Unreal Engine 5. Cubriremos desde configuración básica hasta blueprints y materiales avanzados.
-            </p>
+          <div class="md:w-3/5 p-6 md:p-8 space-y-6 flex flex-col justify-center">
+            <div>
+              <span 
+  class="inline-block px-3 py-1 border rounded-full text-xs font-semibold font-['Poppins'] uppercase mb-3"
+  :class="getTipoStyles(event.tipo)"
+>
+  {{ event.tipo }}
+</span>
+              
+              <h2 class="text-3xl font-bold text-white font-['Pixelify_Sans'] leading-tight">
+                {{ event.titulo }}
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-['Poppins']">
+              <div class="flex items-center gap-3 text-gray-300">
+                <span class="text-xl">📅</span>
+                <span>{{ event.fecha }}</span>
+              </div>
+              <div class="flex items-center gap-3 text-gray-300">
+                <span class="text-xl">⏰</span>
+                <span>{{ event.hora }}h</span>
+              </div>
+              <div class="flex items-center gap-3" :class="event.plazasLibres > 0 ? 'text-green-400' : 'text-red-400'">
+                <span class="text-xl">👥</span>
+                <span class="font-bold">{{ event.plazasLibres }} plazas libres</span>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-zinc-800">
+              <p class="text-gray-400 text-sm leading-relaxed font-['Poppins']">
+                {{ event.descripcion }}
+              </p>
+            </div>
           </div>
         </div>
       </AnimatedModalContent>
 
-      <AnimatedModalFooter class="gap-3 bg-zinc-900/50 border-t border-zinc-800">
+      <AnimatedModalFooter v-if="event" class="bg-zinc-900/50 border-t border-zinc-800">
         <button 
-          class="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-lg font-bold transition-all duration-300 hover:scale-105 shadow-lg shadow-purple-500/30"
+          class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl font-bold transition-all duration-300 hover:scale-[1.01] shadow-lg shadow-purple-500/20"
         >
-          Inscribirme
+          Inscribirme ahora
         </button>
       </AnimatedModalFooter>
     </AnimatedModalBody>
   </AnimatedModal>
-  </div>
 </template>
