@@ -20,7 +20,8 @@ router.beforeEach((to, from, next) => {
   if (
   from.path !== to.path && 
   to.path !== "/login" && 
-  !to.path.startsWith("/events") 
+  !to.path.startsWith("/events/")&&
+  !from.path.startsWith("/events/")
 ) {
     isTransitioning.value = true
     transitionText.value = routeTexts[to.path] || 'Cargando...'
