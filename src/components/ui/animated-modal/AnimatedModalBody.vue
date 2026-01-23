@@ -161,15 +161,15 @@ onBeforeUnmount(() => {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
+              width="30"
+              height="30"
+              viewBox="0 0 30 30"
               fill="none"
               stroke="currentColor"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="h-4 w-4 text-black transition duration-200 group-hover:scale-125 group-hover:rotate-3 dark:text-white"
+              class="h-8 w-8 text-pink-500 transition duration-200 group-hover:scale-125 group-hover:rotate-3 dark:text-white"
             >
               <path stroke="none" d="M0 0h24v24H0z" fill="none" />
               <path d="M18 6l-12 12" />

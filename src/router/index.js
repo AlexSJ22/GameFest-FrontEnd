@@ -19,7 +19,8 @@ const router = createRouter({
     {
       path: '/games/:id',
       name: 'game-detail',
-      component: () => import('../views/GameDetail.vue')
+      component: () => import('../views/GameDetail.vue'),
+      meta: { skipTransition: true }
     },
 
     {

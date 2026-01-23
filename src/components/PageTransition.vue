@@ -16,26 +16,29 @@ const routeTexts = {
 
 // Escuchar cambios de ruta
 router.beforeEach((to, from, next) => {
-  // Solo hacer transición si cambiamos de página (no en la primera carga)
-  if (
-  from.path !== to.path && 
-  to.path !== "/login" && 
-  !to.path.startsWith("/events") 
-) {
-    isTransitioning.value = true
-    transitionText.value = routeTexts[to.path] || 'Cargando...'
+  // 1. Identify if we are entering OR leaving the detail modal
+  const enteringDetail = to.name === 'event-detail';
+  const leavingDetail = from.name === 'event-detail';
 
-    // Después de 500ms (cuando la pantalla está completamente negra), navegar
+  // 2. Logic to skip transition
+  const shouldSkip = 
+    from.path === to.path || // No path change
+    to.path === "/login" ||  // Going to login
+    enteringDetail ||        // Going TO modal
+    leavingDetail;           // Coming FROM modal ✅
+
+  if (!shouldSkip) {
+    isTransitioning.value = true;
+    transitionText.value = routeTexts[to.path] || 'Cargando...';
+
     setTimeout(() => {
-      next()
-      
-      // Después de navegar, esperar 100ms y luego quitar la pantalla
+      next();
       setTimeout(() => {
-        isTransitioning.value = false
-      }, 100)
-    }, 500)
+        isTransitioning.value = false;
+      }, 100);
+    }, 500);
   } else {
-    next()
+    next();
   }
 })
 </script>

@@ -29,6 +29,7 @@ const close = () => {
 </script>
 
 <template>
+  <div>
   <AnimatedModal 
     :open="isOpen" 
     @update:open="isOpen = $event"
@@ -97,4 +98,5 @@ const close = () => {
       </AnimatedModalFooter>
     </AnimatedModalBody>
   </AnimatedModal>
+  </div>
 </template>
