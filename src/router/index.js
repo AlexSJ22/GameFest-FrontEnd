@@ -13,31 +13,36 @@ const router = createRouter({
     {
       path: '/games',
       name: 'games',
-      component: () => import('../views/GamesView.vue')
+      component: () => import('../views/GamesView.vue'),
+      children: [
+        {
+          path: ':id',
+          name: 'game-detail',
+          component: () => import('../views/GameDetail.vue'),
+          props: true,
+          meta: { skipTransition: true }
+        }
+      ]
     },
 
+
     {
-      path: '/games/:id',
-      name: 'game-detail',
-      component: () => import('../views/GameDetail.vue'),
-      meta: { skipTransition: true }
+      path: '/events',
+      name: 'events',
+      component: () => import('../views/EventsView.vue'),
+      children: [
+        {
+          path: ':id',
+          name: 'event-detail',
+          component: () => import('../views/EventDetail.vue'),
+          meta: { skipTransition: true },
+          props: true
+
+        }
+      ]
     },
 
-    {
-    path: '/events',
-    name: 'events',
-    component: () => import('../views/EventsView.vue'),
-    children: [
-      {
-        path: ':id', 
-        name: 'event-detail',
-        component: () => import('../views/EventDetail.vue'),
-        props: true
-      }
-    ]
-  },
 
-    
 
     {
       path: '/login',

@@ -1,18 +1,54 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import api from '@/lib/api'
 import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern.vue'
+import GlareCard from '@/components/ui/GlareCard.vue' 
 
+const router = useRouter()
+
+// State
+const games = ref([])
+const loading = ref(true)
 const searchQuery = ref('')
+const IMAGE_BASE_URL = 'http://localhost/GameFest-BackEnd-feat-methodsSQL/gamefest_resources/games/'
 
-const placeholderCards = Array.from({ length: 6 }, (_, i) => i)
+// Fetch Games
+const fetchGames = async () => {
+  loading.value = true
+  try {
+    const response = await api.get('games.php')
+    games.value = response.data
+  } catch (error) {
+    console.error('Error fetching games:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Filter Logic
+const filteredGames = computed(() => {
+  if (!searchQuery.value) return games.value
+  const query = searchQuery.value.toLowerCase()
+  return games.value.filter(game => 
+    game.titulo.toLowerCase().includes(query) || 
+    game.genero.toLowerCase().includes(query)
+  )
+})
+
+const openGameDetail = (gameId) => {
+  router.push({ name: 'game-detail', params: { id: gameId } })
+}
+
+onMounted(fetchGames)
 </script>
 
 <template>
   <div class="relative min-h-screen bg-black">
     
     <div class="eventHero relative h-[60vh] sm:h-[70vh] md:h-[80vh] w-full overflow-hidden">
-      <h1 class="text-5xl sm:text-7xl md:text-8xl lg:text-9xl absolute font-bold font-['Poppins'] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 [text-shadow:_0_0_30px_black] bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent px-4 text-center">
-        JUEGOS
+      <h1 class="text-5xl sm:text-7xl md:text-8xl lg:text-9xl absolute font-bold font-['Poppins'] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 [text-shadow:_0_0_30px_black] bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent px-4 text-center uppercase">
+        Juegos
       </h1>
       <InteractiveGridPattern
         class="w-full h-full"
@@ -23,59 +59,78 @@ const placeholderCards = Array.from({ length: 6 }, (_, i) => i)
       />
     </div>
 
-    <div class="py-8 px-4 sm:py-12 sm:px-6 lg:px-10 max-w-7xl mx-auto">
+    <div class="py-8 px-4 sm:py-12 sm:px-6 lg:px-10 max-w-[1400px] mx-auto min-h-[50vh]">
       
-      <div class="mb-12">
-        <div class="max-w-2xl">
+      <div class="flex flex-col mb-12">
+        <div class="w-full max-w-2xl text-center md:text-left mx-auto md:mx-0">
           <h2 class="text-3xl sm:text-4xl font-bold font-['Pixelify_Sans'] bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
             Explorar Catálogo
-        </h2>
-        <p class="text-gray-400 mb-5 text-sm sm:text-base font-['Poppins']">
-        Encuentra el evento perfecto para ti
-        </p>
+          </h2>
+          <p class="text-gray-400 mb-5 text-sm sm:text-base font-['Poppins']">
+            Encuentra el juego perfecto para ti
+          </p>
           <div class="relative">
-              <input 
+            <input 
               v-model="searchQuery"
               type="text" 
-              placeholder="Buscar un juego..."
-              class="w-full px-5 py-4 bg-white/5 border border-purple-500/30 rounded-2xl text-white font-['Poppins'] text-base focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent backdrop-blur-md transition-all placeholder:text-gray-500 hover:bg-white/10"
+              placeholder="Buscar por nombre o género..."
+              class="w-full px-5 py-4 bg-white/5 border border-purple-500/30 rounded-2xl text-white font-['Poppins'] text-base focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent backdrop-blur-md transition-all placeholder:text-gray-500 hover:bg-white/10"
             />
-            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-pink-500/50">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div v-if="loading" class="flex justify-center items-center py-20">
+        <p class="text-purple-500 font-['Pixelify_Sans'] text-2xl animate-pulse">Cargando catálogo...</p>
+      </div>
+
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center">
         <div 
-          v-for="card in placeholderCards" 
-          :key="card"
-          class="relative group"
+          v-for="game in filteredGames" 
+          :key="game.id"
+          @click="openGameDetail(game.id)"
+          class="cursor-pointer group flex justify-center w-full"
         >
-          <div class="h-64 sm:h-72 md:h-80 w-full rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm flex items-center justify-center overflow-hidden transition-all duration-300 hover:border-blue-500/50 hover:bg-white/10">
-            
-            <div class="absolute inset-2 border border-dashed border-white/5 rounded-xl pointer-events-none"></div>
-            
-            <p class="text-neutral-500 font-['Pixelify_Sans'] text-xl sm:text-2xl group-hover:text-blue-400 transition-colors">
-              Tarjetas de Jagoba
-            </p>
-
-            <div class="absolute top-4 right-4 h-2 w-2 bg-blue-500/30 rounded-full animate-pulse"></div>
-          </div>
+          <GlareCard 
+            style="height: 450px; width: 100%; max-width: 400px;"
+            class="flex flex-col justify-end p-6 relative overflow-hidden rounded-3xl"
+          >
+             <img 
+               :src="`${IMAGE_BASE_URL}${game.imagen}`" 
+               :alt="game.titulo"
+               class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500 group-hover:scale-105"
+             />
+             <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+             
+             <div class="relative z-10 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+               <span class="inline-block px-3 py-1 mb-3 bg-purple-500/30 border border-purple-500/50 text-purple-300 rounded-full text-xs font-bold uppercase backdrop-blur-md shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                 {{ game.genero }}
+               </span>
+               <h3 class="text-3xl font-bold text-white font-['Pixelify_Sans'] mb-1 drop-shadow-md leading-none">
+                  {{ game.titulo }}
+               </h3>
+             </div>
+          </GlareCard>
         </div>
       </div>
-
-      <div v-if="searchQuery && placeholderCards.length === 0" class="text-center py-20">
-        <p class="text-gray-500 font-['Poppins']">No se encontraron juegos que coincidan con "{{ searchQuery }}"</p>
+      
+      <div v-if="!loading && filteredGames.length === 0" class="text-center py-20 text-gray-500 font-['Poppins']">
+        No se encontraron juegos con esa búsqueda.
       </div>
-
     </div>
+
+    <router-view v-slot="{ Component }">
+      <transition 
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <component :is="Component" />
+      </transition>
+    </router-view>
+
   </div>
 </template>
-
-<style scoped>
-/* You can add specific transitions here if needed */
-</style>

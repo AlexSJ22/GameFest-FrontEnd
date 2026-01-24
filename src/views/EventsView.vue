@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/lib/api' // Your configured Axios instance
+import api from '@/lib/api' 
 import GlareCard from '@/components/ui/GlareCard.vue'
 import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern.vue'
 
@@ -17,7 +17,6 @@ const filters = ref({
   onlyAvailable: false
 })
 
-// Fetching Logic
 const fetchEvents = async () => {
   loading.value = true
   try {
@@ -39,7 +38,6 @@ const openEventDetail = (eventId) => {
   router.push({ name: 'event-detail', params: { id: eventId } })
 }
 
-// Watch for filter changes to reset pagination
 watch(filters, () => {
   currentPage.value = 1
   fetchEvents()

@@ -16,20 +16,22 @@ const routeTexts = {
 
 // Escuchar cambios de ruta
 router.beforeEach((to, from, next) => {
-  // 1. Identify if we are entering OR leaving the detail modal
-  const enteringDetail = to.name === 'event-detail';
-  const leavingDetail = from.name === 'event-detail';
+  // 1. Check if either the "to" or "from" route has the skipTransition meta
+  // We use matched.some() to check parent routes as well, just in case
+  const isSkippedRoute = to.meta.skipTransition || from.meta.skipTransition;
 
   // 2. Logic to skip transition
   const shouldSkip = 
-    from.path === to.path || // No path change
-    to.path === "/login" ||  // Going to login
-    enteringDetail ||        // Going TO modal
-    leavingDetail;           // Coming FROM modal ✅
+    from.path === to.path || 
+    to.path === "/login" || 
+    isSkippedRoute; // This now covers game-detail AND event-detail (if you add the meta tag to events too)
 
   if (!shouldSkip) {
     isTransitioning.value = true;
-    transitionText.value = routeTexts[to.path] || 'Cargando...';
+    
+    // Fix for dynamic routes: check if the path starts with a known key or use exact match
+    const baseText = Object.keys(routeTexts).find(key => to.path.startsWith(key) && key !== '/');
+    transitionText.value = routeTexts[baseText || to.path] || routeTexts[to.path] || 'Cargando...';
 
     setTimeout(() => {
       next();
