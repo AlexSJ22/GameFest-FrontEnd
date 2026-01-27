@@ -2,11 +2,11 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/lib/api' // [cite: 48]
-import { 
+import {
   AnimatedModal,
-  AnimatedModalBody, 
-  AnimatedModalContent, 
-  AnimatedModalFooter 
+  AnimatedModalBody,
+  AnimatedModalContent,
+  AnimatedModalFooter
 } from '@/components/ui/animated-modal'
 
 const props = defineProps({
@@ -18,7 +18,7 @@ const event = ref(null)
 const loading = ref(true)
 
 // Absolute path to reach your backend resources
-const IMAGE_BASE_URL = 'http://localhost/GameFest-BackEnd-feat-methodsSQL/gamefest_resources/events/'
+const IMAGE_BASE_URL = 'http://localhost/GameFest-BackEnd/gamefest_resources/events/'
 
 const isOpen = computed({
   get: () => true,
@@ -36,9 +36,7 @@ const close = () => {
 const fetchEventDetail = async () => {
   loading.value = true
   try {
-    const response = await api.get('events.php', {
-      params: { id: props.id }
-    })
+    const response = await api.get(`/events/${props.id}`)
     event.value = response.data
   } catch (error) {
     console.error('Error loading event details:', error)
@@ -65,21 +63,12 @@ const getTipoStyles = (tipo) => {
 </script>
 
 <template>
-  <AnimatedModal 
-    :open="isOpen" 
-    @update:open="isOpen = $event"
-    :close-on-esc="true"
-  >
-    <AnimatedModalBody 
+  <AnimatedModal :open="isOpen" @update:open="isOpen = $event" :close-on-esc="true">
+    <AnimatedModalBody
       class="md:max-w-4xl w-full bg-zinc-900 border border-purple-500/30 shadow-2xl shadow-purple-500/20 overflow-hidden"
-      :show-close="false"
-      :close-on-outside="true"
-      :lock-scroll="true"
-    >
-      <button 
-        @click="close" 
-        class="absolute top-4 right-4 z-50 w-9 h-9 flex items-center justify-center rounded-full bg-zinc-800 hover:bg-purple-500/20 border border-zinc-700 hover:border-purple-500/50 text-gray-400 hover:text-white transition-all duration-300"
-      >
+      :show-close="false" :close-on-outside="true" :lock-scroll="true">
+      <button @click="close"
+        class="absolute top-4 right-4 z-50 w-9 h-9 flex items-center justify-center rounded-full bg-zinc-800 hover:bg-purple-500/20 border border-zinc-700 hover:border-purple-500/50 text-gray-400 hover:text-white transition-all duration-300">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -91,25 +80,21 @@ const getTipoStyles = (tipo) => {
 
       <AnimatedModalContent v-else-if="event" class="p-0">
         <div class="flex flex-col md:flex-row min-h-[450px]">
-          
+
           <div class="md:w-2/5 relative h-56 md:h-auto overflow-hidden bg-zinc-800">
-            <img 
-              :src="IMAGE_BASE_URL + event.imagen" 
-              :alt="event.titulo" 
-              class="w-full h-full object-cover opacity-80"
-            />
+            <img :src="IMAGE_BASE_URL + event.imagen" :alt="event.titulo"
+              class="w-full h-full object-cover opacity-80" />
             <div class="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-zinc-900/40 to-transparent"></div>
           </div>
 
           <div class="md:w-3/5 p-6 md:p-8 space-y-6 flex flex-col justify-center">
             <div>
-              <span 
-  class="inline-block px-3 py-1 border rounded-full text-xs font-semibold font-['Poppins'] uppercase mb-3"
-  :class="getTipoStyles(event.tipo)"
->
-  {{ event.tipo }}
-</span>
-              
+              <span
+                class="inline-block px-3 py-1 border rounded-full text-xs font-semibold font-['Poppins'] uppercase mb-3"
+                :class="getTipoStyles(event.tipo)">
+                {{ event.tipo }}
+              </span>
+
               <h2 class="text-3xl font-bold text-white font-['Pixelify_Sans'] leading-tight">
                 {{ event.titulo }}
               </h2>
@@ -140,9 +125,8 @@ const getTipoStyles = (tipo) => {
       </AnimatedModalContent>
 
       <AnimatedModalFooter v-if="event" class="bg-zinc-900/50 border-t border-zinc-800">
-        <button 
-          class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl font-bold transition-all duration-300 hover:scale-[1.01] shadow-lg shadow-purple-500/20"
-        >
+        <button
+          class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl font-bold transition-all duration-300 hover:scale-[1.01] shadow-lg shadow-purple-500/20">
           Inscribirme ahora
         </button>
       </AnimatedModalFooter>

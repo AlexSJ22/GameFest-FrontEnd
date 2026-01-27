@@ -177,7 +177,7 @@ const getTipoStyles = (tipo) => {
               </div>
               <img
                 class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
-                :src="`http://localhost/GameFest-BackEnd-feat-methodsSQL/gamefest_resources/events/${event.imagen}`"
+                :src="`http://localhost/GameFest-BackEnd/gamefest_resources/events/${event.imagen}`"
                 :alt="event.titulo" />
             </GlareCard>
           </div>
