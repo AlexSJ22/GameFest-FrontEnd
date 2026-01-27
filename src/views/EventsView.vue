@@ -9,6 +9,7 @@ const router = useRouter()
 
 // Reactive State
 const events = ref([])
+const total = ref(0)
 const loading = ref(true)
 const currentPage = ref(1) // Page starts at 1
 const filters = ref({
@@ -24,7 +25,8 @@ const fetchEvents = async () => {
       params: { page: currentPage.value }
     })
     console.log('Datos de la API:', response.data)
-    events.value = response.data
+    events.value = response.data.eventos
+    total.value = response.data.total
 
   } catch (error) {
     console.error('Error fetching events:', error)
@@ -189,7 +191,7 @@ const getTipoStyles = (tipo) => {
             Anterior
           </button>
           <span class="text-purple-400 font-bold font-['Pixelify_Sans'] text-lg">Página {{ currentPage }}</span>
-          <button @click="currentPage++; fetchEvents()" :disabled="events.length < 9"
+          <button @click="currentPage++; fetchEvents()" :disabled="total <= 9 * currentPage"
             class="px-6 py-2 bg-white/5 border border-purple-500/30 text-white rounded-xl font-['Poppins'] hover:bg-white/10 transition-all disabled:opacity-20 disabled:cursor-not-allowed">
             Siguiente
           </button>
