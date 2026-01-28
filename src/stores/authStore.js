@@ -10,7 +10,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async login(email, password) {
       // Calls your login.php file
-      const response = await api.post('login.php', { email, password })
+      const response = await api.post('/auth/login.php', { email, password })
       if (response.data.success) {
         this.user = response.data.user
         this.isLoggedIn = true
@@ -20,7 +20,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async register(username, email, password) {
       // Calls your register.php file
-      const response = await api.post('register.php', { username, email, password })
+      const response = await api.post('/auth/register.php', { username, email, password })
       return response.data
     },
     logout() {
