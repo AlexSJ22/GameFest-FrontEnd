@@ -27,14 +27,28 @@ const fetchGames = async () => {
 }
 
 // Filter Logic
-const filteredGames = computed(() => {
-  if (!searchQuery.value) return games.value
-  const query = searchQuery.value.toLowerCase()
-  return games.value.filter(game =>
-    game.titulo.toLowerCase().includes(query) ||
-    game.genero.toLowerCase().includes(query)
-  )
-})
+const handleSearch = async () => {
+  const query = searchQuery.value.trim()
+
+  if (!query) {
+    fetchGames()
+    return
+  }
+
+  try {
+    loading.value = true
+    const response = await api.get(`/games/gamefilter.php?q=${query}`)
+    games.value = response.data
+  } catch (error) {
+    console.error('Error searching games:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+
+
+
 
 const openGameDetail = (gameId) => {
   router.push({ name: 'game-detail', params: { id: gameId } })
@@ -67,7 +81,7 @@ onMounted(fetchGames)
             Encuentra el juego perfecto para ti
           </p>
           <div class="relative">
-            <input v-model="searchQuery" type="text" placeholder="Buscar por nombre o género..."
+            <input v-model="searchQuery"  @keyup.enter="handleSearch" type="text" placeholder="Buscar por nombre o género..."
               class="w-full px-5 py-4 bg-white/5 border border-purple-500/30 rounded-2xl text-white font-['Poppins'] text-base focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent backdrop-blur-md transition-all placeholder:text-gray-500 hover:bg-white/10" />
           </div>
         </div>
@@ -78,7 +92,7 @@ onMounted(fetchGames)
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center">
-        <div v-for="game in filteredGames" :key="game.id" @click="openGameDetail(game.id)"
+        <div v-for="game in games" :key="game.id" @click="openGameDetail(game.id)"
           class="cursor-pointer group flex justify-center w-full">
           <GlareCard style="height: 450px; width: 100%; max-width: 400px;"
             class="flex flex-col justify-end p-6 relative overflow-hidden rounded-3xl">
@@ -99,7 +113,7 @@ onMounted(fetchGames)
         </div>
       </div>
 
-      <div v-if="!loading && filteredGames.length === 0" class="text-center py-20 text-gray-500 font-['Poppins']">
+      <div v-if="!loading && games.length === 0" class="text-center py-20 text-gray-500 font-['Poppins']">
         No se encontraron juegos con esa búsqueda.
       </div>
     </div>
