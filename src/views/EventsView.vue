@@ -21,9 +21,26 @@ const filters = ref({
 const fetchEvents = async () => {
   loading.value = true
   try {
-    const response = await api.get('/events', {
-      params: { page: currentPage.value }
-    })
+    let endpoint = '/events'
+    const params = { page: currentPage.value }
+
+    if (filters.value.type) {
+      endpoint = '/events/filter/type'
+      params.tipo = filters.value.type
+    }
+    if (filters.value.date) {
+      endpoint = '/events/filter/date'
+      params.tipo = filters.value.type
+    }
+
+    if (filters.value.date) {
+      params.fecha = filters.value.date
+    }
+
+    if (filters.value.onlyAvailable) {
+      endpoint = '/events/filter/available'
+    }
+    const response = await api.get(endpoint, { params })
     console.log('Datos de la API:', response.data)
     events.value = response.data.eventos
     total.value = response.data.total
@@ -96,14 +113,14 @@ const getTipoStyles = (tipo) => {
                 <select v-model="filters.type"
                   class="w-full px-4 py-3 bg-white/5 border border-purple-500/30 rounded-xl text-white font-['Poppins'] text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all hover:bg-white/10">
                   <option value="" class="bg-gray-900">Todos los tipos</option>
-                  <option value="presentacion" class="bg-gray-900">Presentación</option>
-                  <option value="charla" class="bg-gray-900">Charla</option>
-                  <option value="taller" class="bg-gray-900">Taller</option>
-                  <option value="mesa-redonda" class="bg-gray-900">Mesa Redonda</option>
-                  <option value="exhibicion" class="bg-gray-900">Exhibición</option>
-                  <option value="torneo" class="bg-gray-900">Torneo</option>
-                  <option value="networking" class="bg-gray-900">Networking</option>
-                  <option value="competicion" class="bg-gray-900">Competición</option>
+                  <option value="Presentación" class="bg-gray-900">Presentación</option>
+                  <option value="Charla" class="bg-gray-900">Charla</option>
+                  <option value="Taller" class="bg-gray-900">Taller</option>
+                  <option value="Mesa Redonda" class="bg-gray-900">Mesa Redonda</option>
+                  <option value="Exhibición" class="bg-gray-900">Exhibición</option>
+                  <option value="Torneo" class="bg-gray-900">Torneo</option>
+                  <option value="Networking" class="bg-gray-900">Networking</option>
+                  <option value="Competición" class="bg-gray-900">Competición</option>
                 </select>
               </div>
 
