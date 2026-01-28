@@ -57,17 +57,20 @@ const router = createRouter({
     },
 
     {
-  path: '/404',
-  name: 'Not-Found',
-  component: () => import('../views/404.vue'),
-  meta: { hideHeader: true } 
-},
-{
-  path: '/:pathMatch(.*)*',
-  redirect: '/404'
-}
-
-
+      path: '/404',
+      name: 'Not-Found',
+      component: () => import('../views/404.vue'),
+      meta: { hideHeader: true }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/404'
+    },
+    {
+      path: '/MyEvents',
+      name: 'my-events',
+      component: () => import('../views/MyEventsView.vue')
+    }
   ],
 })
 
