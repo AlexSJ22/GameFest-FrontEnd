@@ -9,8 +9,9 @@ const router = useRouter()
 
 // Reactive State
 const events = ref([])
+const total = ref(0)
 const loading = ref(true)
-const currentPage = ref(1) // Page starts at 1 [cite: 110]
+const currentPage = ref(1) // Page starts at 1
 const filters = ref({
   type: '',
   date: '',
@@ -20,12 +21,29 @@ const filters = ref({
 const fetchEvents = async () => {
   loading.value = true
   try {
-    const response = await api.get('events.php', {
-      params: { page: currentPage.value }
-    })
+    let endpoint = '/events'
+    const params = { page: currentPage.value }
 
-    events.value = response.data
+    if (filters.value.type) {
+      endpoint = '/events/filter/type'
+      params.tipo = filters.value.type
+    }
+    if (filters.value.date) {
+      endpoint = '/events/filter/date'
+      params.tipo = filters.value.type
+    }
 
+    if (filters.value.date) {
+      params.fecha = filters.value.date
+    }
+
+    if (filters.value.onlyAvailable) {
+      endpoint = '/events/filter/available'
+    }
+    const response = await api.get(endpoint, { params })
+    console.log('Datos de la API:', response.data)
+    events.value = response.data.eventos
+    total.value = response.data.total
 
   } catch (error) {
     console.error('Error fetching events:', error)
@@ -95,14 +113,14 @@ const getTipoStyles = (tipo) => {
                 <select v-model="filters.type"
                   class="w-full px-4 py-3 bg-white/5 border border-purple-500/30 rounded-xl text-white font-['Poppins'] text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all hover:bg-white/10">
                   <option value="" class="bg-gray-900">Todos los tipos</option>
-                  <option value="presentacion" class="bg-gray-900">Presentación</option>
-                  <option value="charla" class="bg-gray-900">Charla</option>
-                  <option value="taller" class="bg-gray-900">Taller</option>
-                  <option value="mesa-redonda" class="bg-gray-900">Mesa Redonda</option>
-                  <option value="exhibicion" class="bg-gray-900">Exhibición</option>
-                  <option value="torneo" class="bg-gray-900">Torneo</option>
-                  <option value="networking" class="bg-gray-900">Networking</option>
-                  <option value="competicion" class="bg-gray-900">Competición</option>
+                  <option value="Presentación" class="bg-gray-900">Presentación</option>
+                  <option value="Charla" class="bg-gray-900">Charla</option>
+                  <option value="Taller" class="bg-gray-900">Taller</option>
+                  <option value="Mesa Redonda" class="bg-gray-900">Mesa Redonda</option>
+                  <option value="Exhibición" class="bg-gray-900">Exhibición</option>
+                  <option value="Torneo" class="bg-gray-900">Torneo</option>
+                  <option value="Networking" class="bg-gray-900">Networking</option>
+                  <option value="Competición" class="bg-gray-900">Competición</option>
                 </select>
               </div>
 
@@ -178,7 +196,7 @@ const getTipoStyles = (tipo) => {
               </div>
               <img
                 class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
-                :src="`http://localhost/GameFest-BackEnd-feat-methodsSQL/gamefest_resources/events/${event.imagen}`"
+                :src="`http://localhost/GameFest-BackEnd/gamefest_resources/events/${event.imagen}`"
                 :alt="event.titulo" />
             </GlareCard>
           </div>
@@ -190,7 +208,7 @@ const getTipoStyles = (tipo) => {
             Anterior
           </button>
           <span class="text-purple-400 font-bold font-['Pixelify_Sans'] text-lg">Página {{ currentPage }}</span>
-          <button @click="currentPage++; fetchEvents()" :disabled="events.length < 9"
+          <button @click="currentPage++; fetchEvents()" :disabled="total <= 9 * currentPage"
             class="px-6 py-2 bg-white/5 border border-purple-500/30 text-white rounded-xl font-['Poppins'] hover:bg-white/10 transition-all disabled:opacity-20 disabled:cursor-not-allowed">
             Siguiente
           </button>
