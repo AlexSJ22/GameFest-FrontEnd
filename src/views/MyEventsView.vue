@@ -33,12 +33,12 @@ const fetchMyEvents = async () => {
 
 // Handle Unsubscribe (Backend + Frontend update)
 const handleUnsubscribe = async (eventId) => {
-  if(!confirm('¿Estás seguro de que quieres desapuntarte?')) return;
+  if (!confirm('¿Estás seguro de que quieres desapuntarte?')) return;
 
   try {
     // Call your existing unsignup endpoint
     const response = await api.post(`/events/unsignup.php?id=${eventId}`)
-    
+
     if (response.data.success) {
       // If success, remove from local list immediately
       myEvents.value = myEvents.value.filter(e => e.id !== eventId)
@@ -146,14 +146,15 @@ onMounted(fetchMyEvents)
         </div>
 
         <div v-if="loading" class="text-center py-12">
-            <p class="text-purple-400 animate-pulse font-['Pixelify_Sans'] text-xl">Cargando tus eventos...</p>
+          <p class="text-purple-400 animate-pulse font-['Pixelify_Sans'] text-xl">Cargando tus eventos...</p>
         </div>
 
         <div v-else class="flex flex-col gap-4">
-            <MyEventsCard v-for="event in myEvents" :key="event.id" :event="event" @unsubscribe="handleUnsubscribe" />
+          <MyEventsCard v-for="event in myEvents" :key="event.id" :event="event" @unsubscribe="handleUnsubscribe" />
         </div>
 
-        <div v-if="!loading && myEvents.length === 0" class="text-center py-12 bg-white/5 rounded-xl border border-white/10">
+        <div v-if="!loading && myEvents.length === 0"
+          class="text-center py-12 bg-white/5 rounded-xl border border-white/10">
           <p class="text-gray-400 font-['Poppins'] text-lg">No estás inscrito en ningún evento.</p>
           <router-link to="/events" class="text-purple-400 hover:text-purple-300 mt-2 inline-block font-bold">
             ¡Explorar eventos disponibles!

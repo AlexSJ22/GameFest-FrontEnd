@@ -139,7 +139,7 @@ const handleUnsubscribe = () => {
       <div class="relative w-[200px] md:w-[250px] lg:w-[300px] overflow-hidden">
         <div class="diagonal-clip absolute inset-0">
           <img 
-            :src="`http://localhost/GameFest-BackEnd-feat-methodsSQL/gamefest_resources/events/${event.imagen}`"
+            :src="`http://localhost/GameFest-BackEnd/gamefest_resources/events/${event.imagen}`"
             :alt="event.titulo"
             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
