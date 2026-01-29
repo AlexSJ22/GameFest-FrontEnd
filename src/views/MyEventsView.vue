@@ -1,53 +1,39 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import LiquidBackground from '@/components/ui/LiquidBackground.vue'
 import MyEventsCard from '@/components/MyEventsCard.vue'
-import TextGenerateEffect from '@/components/ui/TextGenerateEffect.vue'
-const authStore = useAuthStore()
-
 import dragonImg from '../assets/images/wallpaper/dragon.jpg'
 import dragon2Img from '../assets/images/wallpaper/dragon2.jpg'
 
-const myEvents = ref([
-  {
-    id: 1,
-    titulo: 'Torneo League of Legends',
-    fecha: '2024-02-15',
-    hora: '18:00',
-    tipo: 'torneo',
-    imagen: 'dragon.jpg'
-  },
-  {
-    id: 2,
-    titulo: 'Charla: El Futuro del Gaming',
-    fecha: '2024-02-20',
-    hora: '16:30',
-    tipo: 'charla',
-    imagen: 'dragon2.jpg'
-  },
-  {
-    id: 3,
-    titulo: 'Taller de Desarrollo de Videojuegos',
-    fecha: '2024-02-25',
-    hora: '10:00',
-    tipo: 'taller',
-    imagen: 'dragon3.jpg'
-  },
-  {
-    id: 4,
-    titulo: 'Exhibición E-Sports Internacional',
-    fecha: '2024-03-01',
-    hora: '19:00',
-    tipo: 'exhibicion',
-    imagen: 'dragon.jpg'
-  }
-])
+const authStore = useAuthStore()
+const myEvents = ref([])
+const error = ref(null)
 
+// Función para desapuntarse de un evento
 const handleUnsubscribe = (eventId) => {
-  console.log('Desapuntando del evento:', eventId)
   myEvents.value = myEvents.value.filter(e => e.id !== eventId)
 }
+
+// Cargar eventos desde el backend PHP al montar
+onMounted(async () => {
+  try {
+    const res = await fetch('/api/users/myevents.php', {
+      credentials: 'include'
+    })
+    const data = await res.json()
+
+    if (!res.ok || !data.success) {
+      // Si no está autenticado, redirige al login
+      window.location.href = '/login'
+    } else {
+      myEvents.value = data.eventos
+    }
+  } catch (e) {
+    error.value = 'Error al cargar tus eventos'
+    console.error(e)
+  }
+})
 </script>
 
 <template>

@@ -1,5 +1,6 @@
 import HomeView from '@/views/HomeView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore' // ✅ AÑADIR
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,7 +10,6 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
-
     {
       path: '/games',
       name: 'games',
@@ -24,8 +24,6 @@ const router = createRouter({
         }
       ]
     },
-
-
     {
       path: '/events',
       name: 'events',
@@ -37,25 +35,19 @@ const router = createRouter({
           component: () => import('../views/EventDetail.vue'),
           meta: { skipTransition: true },
           props: true
-
         }
       ]
     },
-
-
-
     {
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue')
     },
-
     {
       path: '/events/create',
       name: 'create-event',
       component: () => import('../views/CreateEventView.vue')
     },
-
     {
       path: '/404',
       name: 'Not-Found',
@@ -69,9 +61,36 @@ const router = createRouter({
     {
       path: '/MyEvents',
       name: 'my-events',
-      component: () => import('../views/MyEventsView.vue')
+      component: () => import('../views/MyEventsView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/CreateEvents',
+      name: 'create-events',
+      component: () => import('../views/CreateEventView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true}
     }
   ],
 })
+
+
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+  
+  if (authStore.loading) {
+    await authStore.checkAuth()
+  }
+  
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    return next({ name: 'home' })
+  }
+
+  if (to.meta.requiresAdmin && authStore.user?.role !== 'ADMIN') {
+    return next({ name: 'home' })
+  }
+
+  next()
+})
+
 
 export default router
