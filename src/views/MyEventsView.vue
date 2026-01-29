@@ -4,45 +4,13 @@ import { useAuthStore } from '@/stores/authStore'
 import api from '@/lib/api' // Import your API helper
 import LiquidBackground from '@/components/ui/LiquidBackground.vue'
 import MyEventsCard from '@/components/MyEventsCard.vue'
-<<<<<<< HEAD
-=======
 import TextGenerateEffect from '@/components/ui/TextGenerateEffect.vue'
 
 // Import static images for the layout
->>>>>>> feature/CreateEvent
 import dragonImg from '../assets/images/wallpaper/dragon.jpg'
 import dragon2Img from '../assets/images/wallpaper/dragon2.jpg'
 
 const authStore = useAuthStore()
-<<<<<<< HEAD
-const myEvents = ref([])
-const error = ref(null)
-
-// Función para desapuntarse de un evento
-const handleUnsubscribe = (eventId) => {
-  myEvents.value = myEvents.value.filter(e => e.id !== eventId)
-}
-
-// Cargar eventos desde el backend PHP al montar
-onMounted(async () => {
-  try {
-    const res = await fetch('/api/users/myevents.php', {
-      credentials: 'include'
-    })
-    const data = await res.json()
-
-    if (!res.ok || !data.success) {
-      // Si no está autenticado, redirige al login
-      window.location.href = '/login'
-    } else {
-      myEvents.value = data.eventos
-    }
-  } catch (e) {
-    error.value = 'Error al cargar tus eventos'
-    console.error(e)
-  }
-})
-=======
 
 // Reactive State
 const myEvents = ref([])
@@ -84,7 +52,6 @@ const handleUnsubscribe = async (eventId) => {
 }
 
 onMounted(fetchMyEvents)
->>>>>>> feature/CreateEvent
 </script>
 
 <template>
