@@ -62,12 +62,10 @@ const fetchData = async () => {
   }
 }
 
-// 2. Handle Button Click
 const handleInscription = async () => {
-  // --- CHECK 1: Is user logged in? ---
   if (!userStatus.value.loggedIn) {
-    // If not logged in, redirect to login page
-    router.push({ name: 'login' }) 
+    // nose que if user no esta inciado no ahce nada al dar clic al boton 
+    // amtes habia enlace para redicreccionamiento a login.vue
     return;
   }
 

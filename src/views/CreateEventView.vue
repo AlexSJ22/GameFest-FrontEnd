@@ -8,8 +8,6 @@ const events = ref([])
 const loading = ref(true)
 const total = ref(0)
 
-
-
 // Form state
 const formStarted = ref(false)
 const currentStep = ref(1)
@@ -20,15 +18,30 @@ const formData = ref({
   fecha: '',
   hora: '',
   plazas: '',
-  imagen: ''
+  imagen: '',
+  descripcion: ''
 })
 
 const fetchEvents = async () => {
   loading.value = true
   try {
-    const response = await api.get('/events')
-    console.log('Datos de la API:', response.data)
-    events.value = response.data.eventos
+    // Fetch all events by getting total first, then fetching all pages
+    const firstResponse = await api.get('/events', { params: { page: 1 } })
+    total.value = firstResponse.data.total
+    
+    // Calculate how many pages we need (9 events per page)
+    const totalPages = Math.ceil(total.value / 9)
+    
+    // Fetch all pages
+    const allEvents = [...firstResponse.data.eventos]
+    
+    for (let page = 2; page <= totalPages; page++) {
+      const response = await api.get('/events', { params: { page } })
+      allEvents.push(...response.data.eventos)
+    }
+    
+    events.value = allEvents
+    console.log('Total eventos cargados:', events.value.length, 'de', total.value)
   } catch (error) {
     console.error('Error fetching events:', error)
   } finally {
@@ -94,7 +107,7 @@ const startForm = () => {
 }
 
 const nextStep = () => {
-  if (currentStep.value < 3) {
+  if (currentStep.value < 4) {  // Changed from 3 to 4
     currentStep.value++
   }
 }
@@ -105,11 +118,39 @@ const previousStep = () => {
   }
 }
 
-const createEvent = () => {
-  console.log('Evento creado:', formData.value)
-  // Aquí irá la lógica de backend en el futuro
-  eventCreated.value = true
-  formStarted.value = false
+const createEvent = async () => {
+  try {
+    // Prepare the data matching your backend expectations
+    const eventData = {
+      titulo: formData.value.titulo,
+      tipo: formData.value.tipo,
+      fecha: formData.value.fecha,
+      hora: formData.value.hora,
+      plazasLibres: parseInt(formData.value.plazas),  // Backend expects 'plazasLibres'
+      imagen: formData.value.imagen,
+      descripcion: formData.value.descripcion || 'Descripción del evento'  // Add default if empty
+    }
+    
+    console.log('Creando evento:', eventData)
+    
+    // Send POST request to create event - matching your backend endpoint
+    const response = await api.post('/events/createevent.php', eventData)
+    
+    if (response.data.success) {
+      console.log('Evento creado exitosamente:', response.data)
+      eventCreated.value = true
+      formStarted.value = false
+      
+      // Refresh events list to include the new event
+      await fetchEvents()
+    } else {
+      alert('Error al crear evento: ' + (response.data.message || 'Error desconocido'))
+      console.error('Error response:', response.data)
+    }
+  } catch (error) {
+    console.error('Error al crear evento:', error)
+    alert('Error al crear el evento. Por favor intenta de nuevo.')
+  }
 }
 
 const createAnother = () => {
@@ -120,7 +161,8 @@ const createAnother = () => {
     fecha: '',
     hora: '',
     plazas: '',
-    imagen: ''
+    imagen: '',
+    descripcion: ''
   }
   eventCreated.value = false
   formStarted.value = true
@@ -135,7 +177,8 @@ const resetForm = () => {
     fecha: '',
     hora: '',
     plazas: '',
-    imagen: ''
+    imagen: '',
+    descripcion: ''
   }
   eventCreated.value = false
   formStarted.value = false
@@ -147,7 +190,6 @@ onMounted(fetchEvents)
 
 <template>
   <div>
-    <!-- Header with LiquidBackground -->
     <div class="relative h-[60vh] sm:h-[70vh] md:h-[70vh] w-full overflow-hidden">
       <LiquidBackground class="absolute inset-0" />
       <div class="absolute inset-0 bg-violet-900/70 pointer-events-none z-10"></div>
@@ -158,21 +200,17 @@ onMounted(fetchEvents)
         </h1>
       </div>
     </div>
-
-    <!-- Main Content -->
     <div class="py-6 px-4 sm:py-12 sm:px-6 lg:px-10 max-w-[1400px] mx-auto">
-      <!-- Section Title -->
       <div class="mb-6">
         <h2
           class="text-3xl sm:text-4xl font-bold font-['Pixelify_Sans'] bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
           Galería de Eventos
         </h2>
         <p class="text-gray-400 mt-2 text-sm sm:text-base font-['Poppins']">
-          Explora los eventos existentes
+          Explora los eventos existentes ({{ totalEvents }} eventos cargados)
         </p>
       </div>
 
-      <!-- Bending Gallery -->
       <div v-if="loading" class="flex justify-center items-center py-20">
         <p class="text-purple-500 font-['Pixelify_Sans'] text-2xl animate-pulse">Cargando eventos...</p>
       </div>
@@ -185,10 +223,8 @@ onMounted(fetchEvents)
         />
       </div>
 
-      <!-- Statistics Section -->
       <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 sm:mb-12">
         
-        <!-- Total Events Card -->
         <div class="relative overflow-hidden bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl p-6 backdrop-blur-sm group hover:scale-105 transition-all duration-300">
           <div class="absolute top-0 right-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl group-hover:bg-purple-500/30 transition-all"></div>
           <div class="relative z-10">
@@ -204,7 +240,6 @@ onMounted(fetchEvents)
           </div>
         </div>
 
-        <!-- Most Common Type Card -->
         <div class="relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-xl p-6 backdrop-blur-sm group hover:scale-105 transition-all duration-300">
           <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl group-hover:bg-blue-500/30 transition-all"></div>
           <div class="relative z-10">
@@ -220,7 +255,6 @@ onMounted(fetchEvents)
           </div>
         </div>
 
-        <!-- Recent Event Card -->
         <div v-if="recentEvent" class="relative overflow-hidden bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl p-6 backdrop-blur-sm group hover:scale-105 transition-all duration-300">
           <div class="absolute inset-0 opacity-20">
             <img 
@@ -252,7 +286,6 @@ onMounted(fetchEvents)
           </div>
         </div>
 
-        <!-- Placeholder if no recent event -->
         <div v-else class="relative overflow-hidden bg-gradient-to-br from-gray-500/10 to-gray-600/10 border border-gray-500/30 rounded-xl p-6 backdrop-blur-sm">
           <div class="relative z-10">
             <div class="flex items-center justify-between mb-4">
@@ -269,7 +302,6 @@ onMounted(fetchEvents)
 
       </div>
 
-      <!-- Form Section -->
       <div class="mb-6">
         <h2
           class="text-3xl sm:text-4xl font-bold font-['Pixelify_Sans'] bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
@@ -280,10 +312,8 @@ onMounted(fetchEvents)
         </p>
       </div>
 
-      <!-- Form Container -->
       <div class="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6 sm:p-8 md:p-12 min-h-[400px] flex items-center justify-center">
         
-        <!-- Initial State - Big Plus Button -->
         <transition
           mode="out-in"
           enter-active-class="transition-all duration-300 ease-out delay-150"
@@ -308,12 +338,11 @@ onMounted(fetchEvents)
             </button>
           </div>
 
-        <!-- Step 1: Título -->
           <div v-else-if="formStarted && currentStep === 1" key="step1" class="w-full max-w-2xl space-y-6">
             <div class="text-center mb-8">
-              <p class="text-purple-400 text-sm font-['Poppins'] mb-2">Paso 1 de 3</p>
+              <p class="text-purple-400 text-sm font-['Poppins'] mb-2">Paso 1 de 4</p>
               <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
-                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-full w-1/3 transition-all duration-500"></div>
+                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-full w-1/4 transition-all duration-500"></div>
               </div>
             </div>
             
@@ -360,12 +389,11 @@ onMounted(fetchEvents)
             </button>
           </div>
 
-        <!-- Step 2: Fecha y Hora -->
           <div v-else-if="formStarted && currentStep === 2" key="step2" class="w-full max-w-2xl space-y-6">
             <div class="text-center mb-8">
-              <p class="text-purple-400 text-sm font-['Poppins'] mb-2">Paso 2 de 3</p>
+              <p class="text-purple-400 text-sm font-['Poppins'] mb-2">Paso 2 de 4</p>
               <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
-                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-full w-2/3 transition-all duration-500"></div>
+                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-full w-1/2 transition-all duration-500"></div>
               </div>
             </div>
             
@@ -410,12 +438,11 @@ onMounted(fetchEvents)
             </div>
           </div>
 
-        <!-- Step 3: Plazas e Imagen -->
           <div v-else-if="formStarted && currentStep === 3" key="step3" class="w-full max-w-2xl space-y-6">
             <div class="text-center mb-8">
-              <p class="text-purple-400 text-sm font-['Poppins'] mb-2">Paso 3 de 3</p>
+              <p class="text-purple-400 text-sm font-['Poppins'] mb-2">Paso 3 de 4</p>
               <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
-                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-full w-full transition-all duration-500"></div>
+                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-full w-3/4 transition-all duration-500"></div>
               </div>
             </div>
             
@@ -454,8 +481,45 @@ onMounted(fetchEvents)
                 ← Atrás
               </button>
               <button
-                @click="createEvent"
+                @click="nextStep"
                 :disabled="!formData.plazas || !formData.imagen"
+                class="flex-1 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold text-lg font-['Poppins'] hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                Siguiente →
+              </button>
+            </div>
+          </div>
+
+          <div v-else-if="formStarted && currentStep === 4" key="step4" class="w-full max-w-2xl space-y-6">
+            <div class="text-center mb-8">
+              <p class="text-purple-400 text-sm font-['Poppins'] mb-2">Paso 4 de 4</p>
+              <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
+                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-full w-full transition-all duration-500"></div>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-xl sm:text-2xl font-bold text-white mb-3 font-['Pixelify_Sans']">
+                Descripción del Evento
+              </label>
+              <textarea
+                v-model="formData.descripcion"
+                rows="5"
+                placeholder="Describe el evento, su contenido y objetivos..."
+                class="w-full px-6 py-4 bg-white/5 border-2 border-purple-500/30 rounded-xl text-white text-lg font-['Poppins'] focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all placeholder:text-gray-500 resize-none"
+              ></textarea>
+            </div>
+            
+            <div class="flex gap-4">
+              <button
+                @click="previousStep"
+                class="flex-1 px-6 py-4 bg-white/5 border-2 border-purple-500/30 text-white rounded-xl font-semibold text-lg font-['Poppins'] hover:bg-white/10 transition-all"
+              >
+                ← Atrás
+              </button>
+              <button
+                @click="createEvent"
+                :disabled="!formData.descripcion"
                 class="flex-1 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold text-lg font-['Poppins'] hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 Crear Evento ✓
@@ -463,7 +527,6 @@ onMounted(fetchEvents)
             </div>
           </div>
 
-        <!-- Success State -->
           <div v-else-if="eventCreated" key="success" class="text-center space-y-8">
             <div class="relative">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 sm:w-32 sm:h-32 mx-auto text-green-500 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

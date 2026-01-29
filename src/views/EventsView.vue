@@ -1,11 +1,13 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 import api from '@/lib/api'
 import GlareCard from '@/components/ui/GlareCard.vue'
 import InteractiveGridPattern from '@/components/ui/InteractiveGridPattern.vue'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 // Reactive State
 const events = ref([])
@@ -223,6 +225,28 @@ const getTipoStyles = (tipo) => {
         <component :is="Component" />
       </transition>
     </router-view>
+
+    <transition
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="opacity-0 scale-0"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition-all duration-200 ease-in"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-0"
+    >
+      <button
+        v-if="authStore.role === 'ADMIN'"
+        @click="router.push('/events/create')"
+        class="fixed bottom-8 right-8 z-50 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-2xl shadow-purple-500/50 flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 group"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        <div class="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
+        
+       <div class="absolute inset-0 rounded-full bg-purple-500 opacity-0 group-hover:animate-ping group-hover:opacity-75"></div>
+      </button>
+    </transition>
 
   </div>
 </template>
