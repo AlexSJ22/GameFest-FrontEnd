@@ -18,15 +18,26 @@ export const useAuthStore = defineStore('auth', {
       }
       return response.data
     },
+    
     async register(username, email, password) {
       // Calls your register.php file
       const response = await api.post('/auth/register.php', { username, email, password })
       return response.data
     },
-    logout() {
-      this.user = null
-      this.isLoggedIn = false
-      this.role = null
+
+    // --- AQUÍ ESTÁ EL CAMBIO IMPORTANTE ---
+    async logout() {
+      try {
+        // 1. Avisamos al backend para que destruya la sesión PHP
+        await api.post('/auth/logout.php')
+      } catch (error) {
+        console.error('Error al cerrar sesión en el servidor:', error)
+      } finally {
+        // 2. Limpiamos el frontend pase lo que pase
+        this.user = null
+        this.isLoggedIn = false
+        this.role = null
+      }
     }
   }
 })

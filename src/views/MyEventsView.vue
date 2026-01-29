@@ -1,53 +1,57 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
+import api from '@/lib/api' // Import your API helper
 import LiquidBackground from '@/components/ui/LiquidBackground.vue'
 import MyEventsCard from '@/components/MyEventsCard.vue'
 import TextGenerateEffect from '@/components/ui/TextGenerateEffect.vue'
-const authStore = useAuthStore()
 
+// Import static images for the layout
 import dragonImg from '../assets/images/wallpaper/dragon.jpg'
 import dragon2Img from '../assets/images/wallpaper/dragon2.jpg'
 
-const myEvents = ref([
-  {
-    id: 1,
-    titulo: 'Torneo League of Legends',
-    fecha: '2024-02-15',
-    hora: '18:00',
-    tipo: 'torneo',
-    imagen: 'dragon.jpg'
-  },
-  {
-    id: 2,
-    titulo: 'Charla: El Futuro del Gaming',
-    fecha: '2024-02-20',
-    hora: '16:30',
-    tipo: 'charla',
-    imagen: 'dragon2.jpg'
-  },
-  {
-    id: 3,
-    titulo: 'Taller de Desarrollo de Videojuegos',
-    fecha: '2024-02-25',
-    hora: '10:00',
-    tipo: 'taller',
-    imagen: 'dragon3.jpg'
-  },
-  {
-    id: 4,
-    titulo: 'Exhibición E-Sports Internacional',
-    fecha: '2024-03-01',
-    hora: '19:00',
-    tipo: 'exhibicion',
-    imagen: 'dragon.jpg'
-  }
-])
+const authStore = useAuthStore()
 
-const handleUnsubscribe = (eventId) => {
-  console.log('Desapuntando del evento:', eventId)
-  myEvents.value = myEvents.value.filter(e => e.id !== eventId)
+// Reactive State
+const myEvents = ref([])
+const loading = ref(true)
+
+// Fetch user's enrolled events from Backend
+const fetchMyEvents = async () => {
+  loading.value = true
+  try {
+    const response = await api.get('/events/myevents.php')
+    if (response.data.success) {
+      myEvents.value = response.data.eventos
+    }
+  } catch (error) {
+    console.error('Error fetching my events:', error)
+  } finally {
+    loading.value = false
+  }
 }
+
+// Handle Unsubscribe (Backend + Frontend update)
+const handleUnsubscribe = async (eventId) => {
+  if(!confirm('¿Estás seguro de que quieres desapuntarte?')) return;
+
+  try {
+    // Call your existing unsignup endpoint
+    const response = await api.post(`/events/unsignup.php?id=${eventId}`)
+    
+    if (response.data.success) {
+      // If success, remove from local list immediately
+      myEvents.value = myEvents.value.filter(e => e.id !== eventId)
+    } else {
+      alert(response.data.message)
+    }
+  } catch (error) {
+    console.error('Error unsubscribing:', error)
+    alert('Error al desapuntarse del evento')
+  }
+}
+
+onMounted(fetchMyEvents)
 </script>
 
 <template>
@@ -110,7 +114,7 @@ const handleUnsubscribe = (eventId) => {
             <div class="w-full">
               <p class="text-[10px] sm:text-xs uppercase tracking-widest text-purple-400 mb-1 font-['Poppins']">Role</p>
               <p class="text-lg sm:text-xl md:text-2xl font-bold text-purple-400 font-['Pixelify_Sans'] uppercase">
-                {{ authStore.user?.role || 'Pakistanie' }}
+                {{ authStore.user?.role || 'User' }}
               </p>
             </div>
           </div>
@@ -141,10 +145,19 @@ const handleUnsubscribe = (eventId) => {
           </p>
         </div>
 
-        <MyEventsCard v-for="event in myEvents" :key="event.id" :event="event" @unsubscribe="handleUnsubscribe" />
+        <div v-if="loading" class="text-center py-12">
+            <p class="text-purple-400 animate-pulse font-['Pixelify_Sans'] text-xl">Cargando tus eventos...</p>
+        </div>
 
-        <div v-if="myEvents.length === 0" class="text-center py-12">
-          <p class="text-gray-400 font-['Poppins'] text-lg">No estás inscrito en ningún evento</p>
+        <div v-else class="flex flex-col gap-4">
+            <MyEventsCard v-for="event in myEvents" :key="event.id" :event="event" @unsubscribe="handleUnsubscribe" />
+        </div>
+
+        <div v-if="!loading && myEvents.length === 0" class="text-center py-12 bg-white/5 rounded-xl border border-white/10">
+          <p class="text-gray-400 font-['Poppins'] text-lg">No estás inscrito en ningún evento.</p>
+          <router-link to="/events" class="text-purple-400 hover:text-purple-300 mt-2 inline-block font-bold">
+            ¡Explorar eventos disponibles!
+          </router-link>
         </div>
       </div>
     </div>

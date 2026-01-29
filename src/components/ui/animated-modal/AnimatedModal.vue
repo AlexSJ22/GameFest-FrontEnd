@@ -59,10 +59,11 @@ if (import.meta.client) {
 </script>
 
 <template>
-  <slot
-    :open="open"
-    :open-modal="openModal"
-    :close-modal="closeModal"
-    :toggle="toggle"
-  />
+  <div class="animated-modal-root"> <slot
+      :open="open"
+      :open-modal="openModal"
+      :close-modal="closeModal"
+      :toggle="toggle"
+    />
+  </div>
 </template>

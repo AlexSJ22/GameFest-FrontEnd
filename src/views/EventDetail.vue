@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/lib/api' // [cite: 48]
+import api from '@/lib/api' // Your axios instance
 import {
   AnimatedModal,
   AnimatedModalBody,
@@ -10,22 +10,26 @@ import {
 } from '@/components/ui/animated-modal'
 
 const props = defineProps({
-  id: String // [cite: 112]
+  id: String
 })
 
 const router = useRouter()
 const event = ref(null)
 const loading = ref(true)
+const actionLoading = ref(false) // Loading state for the button
 
-// Absolute path to reach your backend resources
+// State to track user status
+const userStatus = ref({
+  loggedIn: false,
+  subscribed: false
+})
+
 const IMAGE_BASE_URL = 'http://localhost/GameFest-BackEnd/gamefest_resources/events/'
 
 const isOpen = computed({
   get: () => true,
   set: (value) => {
-    if (!value) {
-      router.push({ name: 'events' })
-    }
+    if (!value) router.push({ name: 'events' })
   }
 })
 
@@ -33,20 +37,71 @@ const close = () => {
   isOpen.value = false
 }
 
-const fetchEventDetail = async () => {
+// 1. Fetch Event Data AND User Status
+const fetchData = async () => {
   loading.value = true
   try {
-    const response = await api.get(`/events/${props.id}`)
-    event.value = response.data
+    // Run both requests in parallel for speed
+    const [eventRes, statusRes] = await Promise.all([
+      api.get(`/events/${props.id}`),               // Get Event Info
+      api.get(`/events/status.php?id=${props.id}`)  // Get User Status
+    ])
+
+    event.value = eventRes.data
+    
+    // Save status from your new status.php
+    userStatus.value = {
+      loggedIn: statusRes.data.logged_in,
+      subscribed: statusRes.data.subscribed
+    }
+
   } catch (error) {
-    console.error('Error loading event details:', error)
+    console.error('Error loading data:', error)
   } finally {
     loading.value = false
   }
 }
 
-onMounted(fetchEventDetail)
+// 2. Handle Button Click
+const handleInscription = async () => {
+  // --- CHECK 1: Is user logged in? ---
+  if (!userStatus.value.loggedIn) {
+    // If not logged in, redirect to login page
+    router.push({ name: 'login' }) 
+    return;
+  }
 
+  actionLoading.value = true
+  try {
+    if (userStatus.value.subscribed) {
+      // --- LOGIC: UNSUBSCRIBE ---
+      const res = await api.post(`/events/unsignup.php?id=${props.id}`)
+      
+      if (res.data.success) {
+        userStatus.value.subscribed = false
+        event.value.plazasLibres++ // Update UI counter instantly
+      }
+      
+    } else {
+      // --- LOGIC: SUBSCRIBE ---
+      const res = await api.post(`/events/signup.php?id=${props.id}`)
+      
+      if (res.data.success) {
+        userStatus.value.subscribed = true
+        event.value.plazasLibres-- // Update UI counter instantly
+      }
+    }
+  } catch (error) {
+    const msg = error.response?.data?.message || "An error occurred"
+    alert(msg)
+  } finally {
+    actionLoading.value = false
+  }
+}
+
+onMounted(fetchData)
+
+// Helper for pill styles
 const getTipoStyles = (tipo) => {
   const styles = {
     taller: 'bg-purple-500/20 border-purple-500/50 text-purple-400',
@@ -58,7 +113,7 @@ const getTipoStyles = (tipo) => {
     exhibicion: 'bg-cyan-500/20 border-cyan-500/50 text-cyan-400',
     competicion: 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400',
   }
-  return styles[tipo.toLowerCase()] || 'bg-gray-500/20 border-gray-500/50 text-gray-400'
+  return styles[tipo?.toLowerCase()] || 'bg-gray-500/20 border-gray-500/50 text-gray-400'
 }
 </script>
 
@@ -67,6 +122,7 @@ const getTipoStyles = (tipo) => {
     <AnimatedModalBody
       class="md:max-w-4xl w-full bg-zinc-900 border border-purple-500/30 shadow-2xl shadow-purple-500/20 overflow-hidden"
       :show-close="false" :close-on-outside="true" :lock-scroll="true">
+      
       <button @click="close"
         class="absolute top-4 right-4 z-50 w-9 h-9 flex items-center justify-center rounded-full bg-zinc-800 hover:bg-purple-500/20 border border-zinc-700 hover:border-purple-500/50 text-gray-400 hover:text-white transition-all duration-300">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,8 +182,32 @@ const getTipoStyles = (tipo) => {
 
       <AnimatedModalFooter v-if="event" class="bg-zinc-900/50 border-t border-zinc-800">
         <button
-          class="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl font-bold transition-all duration-300 hover:scale-[1.01] shadow-lg shadow-purple-500/20">
-          Inscribirme ahora
+          @click="handleInscription"
+          :disabled="actionLoading || (!userStatus.subscribed && event.plazasLibres <= 0 && userStatus.loggedIn)"
+          class="w-full px-6 py-4 rounded-xl font-bold transition-all duration-300 hover:scale-[1.01] shadow-lg flex justify-center items-center gap-2"
+          :class="[
+            !userStatus.loggedIn 
+                ? 'bg-zinc-700 text-gray-300 hover:bg-zinc-600' 
+            : userStatus.subscribed 
+                ? 'bg-red-500/10 text-red-400 border border-red-500/50 hover:bg-red-500/20' 
+            : event.plazasLibres <= 0 
+                ? 'bg-gray-800 text-gray-500 cursor-not-allowed' 
+                : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-purple-500/20'
+          ]"
+        >
+          <svg v-if="actionLoading" class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+
+          <span v-else>
+             {{ 
+                !userStatus.loggedIn ? 'Inicia sesión para inscribirte' : 
+                userStatus.subscribed ? 'Cancelar Inscripción' : 
+                event.plazasLibres <= 0 ? 'Evento Completo' : 
+                'Inscribirme ahora' 
+             }}
+          </span>
         </button>
       </AnimatedModalFooter>
     </AnimatedModalBody>
