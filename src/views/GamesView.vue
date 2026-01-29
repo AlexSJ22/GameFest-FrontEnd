@@ -29,7 +29,7 @@ const fetchGames = async () => {
 // Filter Logic
 const handleSearch = async () => {
   const query = searchQuery.value.trim()
-
+  console.log(query)
   if (!query) {
     fetchGames()
     return

@@ -1,11 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router' // ✅ Añadir useRouter
 import { useModalStore } from '@/stores/modalStore'
-import { useAuthStore } from '@/stores/authStore' // Importar authStore
+import { useAuthStore } from '@/stores/authStore'
 
 const modalStore = useModalStore()
-const authStore = useAuthStore() // Instanciar authStore
+const authStore = useAuthStore()
+const router = useRouter() // ✅ Añadir esto
 const isOpen = ref(false)
 const isLoaded = ref(false)
 
@@ -29,9 +30,11 @@ const closeMenu = () => {
   isOpen.value = false
 }
 
-const handleLogout = () => {
-  authStore.logout()
+
+const handleLogout = async () => {
+  await authStore.logout()
   closeMenu()
+  router.push('/') // Redirigir a inicio
 }
 </script>
 
@@ -165,6 +168,7 @@ const handleLogout = () => {
             <div class="px-4 py-2 text-purple-300 text-xs font-['Poppins']">
               {{ authStore.user?.username }}
             </div>
+            <RouterLink to="/">
             <button
               @click="handleLogout"
               class="enlace-mobile flex items-center gap-3 px-4 py-3 w-full rounded-xl text-white hover:text-red-500 transition-all font-['Syncopate'] text-sm text-left"
@@ -174,12 +178,15 @@ const handleLogout = () => {
               </svg>
               Cerrar Sesión
             </button>
+            </RouterLink>
           </div>
         </div>
       </div>
     </Transition>
   </nav>
 </template>
+<!--<RouterLink to="/" class="md:hidden absolute left-1/2 -translate-x-1/2 z-50"> <img class="logo w-16 h-16" src="../assets/images/logo/logo2.png" alt="Logo"> </RouterLink>
+ -->
 
 <style scoped>
 .enlace-mobile {
