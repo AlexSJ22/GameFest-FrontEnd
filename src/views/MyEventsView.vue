@@ -33,7 +33,6 @@ const fetchMyEvents = async () => {
 
 // Handle Unsubscribe (Backend + Frontend update)
 const handleUnsubscribe = async (eventId) => {
-  if (!confirm('¿Estás seguro de que quieres desapuntarte?')) return;
 
   try {
     // Call your existing unsignup endpoint
@@ -42,12 +41,9 @@ const handleUnsubscribe = async (eventId) => {
     if (response.data.success) {
       // If success, remove from local list immediately
       myEvents.value = myEvents.value.filter(e => e.id !== eventId)
-    } else {
-      alert(response.data.message)
-    }
+    } 
   } catch (error) {
     console.error('Error unsubscribing:', error)
-    alert('Error al desapuntarse del evento')
   }
 }
 
