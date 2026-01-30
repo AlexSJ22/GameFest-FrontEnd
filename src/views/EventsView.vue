@@ -23,30 +23,23 @@ const filters = ref({
 const fetchEvents = async () => {
   loading.value = true
   try {
-    let endpoint = '/events'
-    const params = { page: currentPage.value }
+    const endpoint = '/events' // Un solo endpoint para todo
 
-    if (filters.value.type) {
-      endpoint = '/events/filter/type'
-      params.tipo = filters.value.type
-    }
-    if (filters.value.date) {
-      endpoint = '/events/filter/date'
-      params.tipo = filters.value.type
+    const params = {
+      page: currentPage.value,
+      tipo: filters.value.type || undefined,
+      fecha: filters.value.date || undefined,
+      plazas: filters.value.onlyAvailable || undefined
     }
 
-    if (filters.value.date) {
-      params.fecha = filters.value.date
-    }
-
-    if (filters.value.onlyAvailable) {
-      endpoint = '/events/filter/available'
-    }
     const response = await api.get(endpoint, { params })
-    console.log('Datos de la API:', response.data)
-    events.value = response.data.eventos
-    total.value = response.data.total
 
+    if (response.data.error) {
+      console.error(response.data.error)
+    } else {
+      events.value = response.data.eventos || []
+      total.value = response.data.total || 0
+    }
   } catch (error) {
     console.error('Error fetching events:', error)
   } finally {
@@ -63,6 +56,15 @@ watch(filters, () => {
   fetchEvents()
 }, { deep: true })
 
+
+watch(
+  () => router.currentRoute.value.path,
+  (newPath, oldPath) => {
+    if (oldPath.includes('/events/') && newPath === '/events') {
+      fetchEvents();
+    }
+  }
+);
 onMounted(fetchEvents)
 
 const getTipoStyles = (tipo) => {
@@ -226,25 +228,20 @@ const getTipoStyles = (tipo) => {
       </transition>
     </router-view>
 
-    <transition
-      enter-active-class="transition-all duration-300 ease-out"
-      enter-from-class="opacity-0 scale-0"
-      enter-to-class="opacity-100 scale-100"
-      leave-active-class="transition-all duration-200 ease-in"
-      leave-from-class="opacity-100 scale-100"
-      leave-to-class="opacity-0 scale-0"
-    >
-      <button
-        v-if="authStore.role === 'ADMIN'"
-        @click="router.push('/events/create')"
-        class="fixed bottom-8 right-8 z-50 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-2xl shadow-purple-500/50 flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 group"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+    <transition enter-active-class="transition-all duration-300 ease-out" enter-from-class="opacity-0 scale-0"
+      enter-to-class="opacity-100 scale-100" leave-active-class="transition-all duration-200 ease-in"
+      leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-0">
+      <button v-if="authStore.role === 'ADMIN'" @click="router.push('/events/create')"
+        class="fixed bottom-8 right-8 z-50 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-2xl shadow-purple-500/50 flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 group">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 sm:w-10 sm:h-10 text-white" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
         </svg>
         <div class="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
-        
-       <div class="absolute inset-0 rounded-full bg-purple-500 opacity-0 group-hover:animate-ping group-hover:opacity-75"></div>
+
+        <div
+          class="absolute inset-0 rounded-full bg-purple-500 opacity-0 group-hover:animate-ping group-hover:opacity-75">
+        </div>
       </button>
     </transition>
 
