@@ -43,6 +43,18 @@ const handleSubmit = async () => {
   if (loading.value) return
 
   errorMessage.value = ''
+
+  if (isRegistering.value) {
+    if (username.value.length < 3) {
+      errorMessage.value = 'El nombre de usuario debe tener al menos 3 caracteres'
+      return
+    }
+
+    if (password.value.length < 6) {
+      errorMessage.value = 'La contraseña debe tener al menos 6 caracteres'
+      return
+    }
+  }
   loading.value = true
 
   try {
@@ -50,7 +62,7 @@ const handleSubmit = async () => {
       console.log('🔍 Datos a enviar:', {
         username: username.value,
         email: email.value,
-        password: password.value ? length : 'VACÍO'
+        password: password.value ? 'length: ' + password.value.length : 'VACÍO'
       })
 
       // Logic for register.php
@@ -71,7 +83,7 @@ const handleSubmit = async () => {
       }
     }
   } catch (e) {
-    errorMessage.value = "Error de conexión con el servidor. Verifica que Apache esté encendido."
+    errorMessage.value = "Credenciales Incorrectas"
   } finally {
     loading.value = false
   }
