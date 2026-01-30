@@ -8,10 +8,12 @@ const events = ref([])
 const loading = ref(true)
 const total = ref(0)
 
-// Form state
 const formStarted = ref(false)
 const currentStep = ref(1)
 const eventCreated = ref(false)
+const uploading = ref(false)
+const selectedImageFile = ref(null)
+const imagePreview = ref(null)
 const formData = ref({
   titulo: '',
   tipo: '',
@@ -22,17 +24,70 @@ const formData = ref({
   descripcion: ''
 })
 
+const handleImageSelect = (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  if (!file.type.startsWith('image/')) {
+    alert('Por favor selecciona un archivo de imagen válido')
+    return
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert('La imagen no debe superar 5MB')
+    return
+  }
+
+  selectedImageFile.value = file
+  
+  // Create preview
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    imagePreview.value = e.target.result
+  }
+  reader.readAsDataURL(file)
+}
+
+const uploadImage = async () => {
+  if (!selectedImageFile.value) {
+    alert('Por favor selecciona una imagen')
+    return null
+  }
+
+  uploading.value = true
+  try {
+    const formDataUpload = new FormData()
+    formDataUpload.append('imagen', selectedImageFile.value)
+
+    const response = await api.post('/events/upload-image.php', formDataUpload, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    if (response.data.success) {
+      return response.data.filename
+    } else {
+      alert('Error al subir imagen: ' + response.data.message)
+      return null
+    }
+  } catch (error) {
+    console.error('Error uploading image:', error)
+    alert('Error al subir la imagen')
+    return null
+  } finally {
+    uploading.value = false
+  }
+}
+
 const fetchEvents = async () => {
   loading.value = true
   try {
-    // Fetch all events by getting total first, then fetching all pages
     const firstResponse = await api.get('/events', { params: { page: 1 } })
     total.value = firstResponse.data.total
     
-    // Calculate how many pages we need (9 events per page)
     const totalPages = Math.ceil(total.value / 9)
     
-    // Fetch all pages
     const allEvents = [...firstResponse.data.eventos]
     
     for (let page = 2; page <= totalPages; page++) {
@@ -56,7 +111,6 @@ const eventImages = computed(() => {
   }))
 })
 
-// Statistics computed properties
 const totalEvents = computed(() => events.value.length)
 
 const mostCommonType = computed(() => {
@@ -74,7 +128,6 @@ const mostCommonType = computed(() => {
 const recentEvent = computed(() => {
   if (events.value.length === 0) return null
   
-  // Sort by date and get the most recent
   const sorted = [...events.value].sort((a, b) => {
     return new Date(b.fecha) - new Date(a.fecha)
   })
@@ -100,14 +153,13 @@ const getTipoStyles = (tipo) => {
   return styles[tipo?.toLowerCase()] || 'bg-gray-500/20 border-gray-500/50 text-gray-400'
 }
 
-// Form functions
 const startForm = () => {
   formStarted.value = true
   currentStep.value = 1
 }
 
 const nextStep = () => {
-  if (currentStep.value < 4) {  // Changed from 3 to 4
+  if (currentStep.value < 4) {
     currentStep.value++
   }
 }
@@ -120,20 +172,25 @@ const previousStep = () => {
 
 const createEvent = async () => {
   try {
-    // Prepare the data matching your backend expectations
+    const imageName = await uploadImage()
+    
+    if (!imageName) {
+      alert('Debes subir una imagen para el evento')
+      return
+    }
+
     const eventData = {
       titulo: formData.value.titulo,
       tipo: formData.value.tipo,
       fecha: formData.value.fecha,
       hora: formData.value.hora,
-      plazasLibres: parseInt(formData.value.plazas),  // Backend expects 'plazasLibres'
-      imagen: formData.value.imagen,
-      descripcion: formData.value.descripcion || 'Descripción del evento'  // Add default if empty
+      plazasLibres: parseInt(formData.value.plazas),
+      imagen: imageName,  
+      descripcion: formData.value.descripcion
     }
     
     console.log('Creando evento:', eventData)
     
-    // Send POST request to create event - matching your backend endpoint
     const response = await api.post('/events/createevent.php', eventData)
     
     if (response.data.success) {
@@ -141,7 +198,6 @@ const createEvent = async () => {
       eventCreated.value = true
       formStarted.value = false
       
-      // Refresh events list to include the new event
       await fetchEvents()
     } else {
       alert('Error al crear evento: ' + (response.data.message || 'Error desconocido'))
@@ -164,6 +220,8 @@ const createAnother = () => {
     imagen: '',
     descripcion: ''
   }
+  selectedImageFile.value = null
+  imagePreview.value = null
   eventCreated.value = false
   formStarted.value = true
   currentStep.value = 1
@@ -180,6 +238,8 @@ const resetForm = () => {
     imagen: '',
     descripcion: ''
   }
+  selectedImageFile.value = null
+  imagePreview.value = null
   eventCreated.value = false
   formStarted.value = false
   currentStep.value = 1
@@ -440,7 +500,7 @@ onMounted(fetchEvents)
 
           <div v-else-if="formStarted && currentStep === 3" key="step3" class="w-full max-w-2xl space-y-6">
             <div class="text-center mb-8">
-              <p class="text-purple-400 text-sm font-['Poppins'] mb-2">Paso 3 de 4</p>
+              <p class="text-purple-400 text-sm font-['Poppins'] mb-2">Paso 3 of 4</p>
               <div class="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
                 <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-full w-3/4 transition-all duration-500"></div>
               </div>
@@ -462,14 +522,43 @@ onMounted(fetchEvents)
               
               <div>
                 <label class="block text-xl sm:text-2xl font-bold text-white mb-3 font-['Pixelify_Sans']">
-                  Imagen del Evento (URL)
+                  Imagen del Evento
                 </label>
-                <input
-                  v-model="formData.imagen"
-                  type="text"
-                  placeholder="Ej: dragon.jpg"
-                  class="w-full px-6 py-4 bg-white/5 border-2 border-purple-500/30 rounded-xl text-white text-lg font-['Poppins'] focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent backdrop-blur-sm transition-all placeholder:text-gray-500"
-                />
+                <div class="relative">
+                  <input
+                    type="file"
+                    @change="handleImageSelect"
+                    accept="image/*"
+                    class="hidden"
+                    id="image-upload"
+                  />
+                  <label
+                    for="image-upload"
+                    class="w-full px-6 py-4 bg-white/5 border-2 border-purple-500/30 rounded-xl text-white text-lg font-['Poppins'] cursor-pointer hover:bg-white/10 transition-all flex items-center justify-center gap-3"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>{{ selectedImageFile ? selectedImageFile.name : 'Seleccionar imagen' }}</span>
+                  </label>
+                </div>
+
+                <div v-if="imagePreview" class="mt-4 rounded-xl overflow-hidden border-2 border-purple-500/30">
+                  <img :src="imagePreview" alt="Preview" class="w-full h-48 object-cover" />
+                  <div class="bg-white/5 px-4 py-2 flex items-center justify-between">
+                    <span class="text-sm text-gray-400 font-['Poppins']">{{ selectedImageFile.name }}</span>
+                    <button
+                      @click="selectedImageFile = null; imagePreview = null"
+                      class="text-red-400 hover:text-red-300 text-sm font-['Poppins']"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+
+                <p class="text-xs text-gray-500 mt-2 font-['Poppins']">
+                  Formatos: JPG, PNG, GIF, WEBP. Máximo 5MB
+                </p>
               </div>
             </div>
             
@@ -482,7 +571,7 @@ onMounted(fetchEvents)
               </button>
               <button
                 @click="nextStep"
-                :disabled="!formData.plazas || !formData.imagen"
+                :disabled="!formData.plazas || !selectedImageFile"
                 class="flex-1 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold text-lg font-['Poppins'] hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 Siguiente →
@@ -519,10 +608,10 @@ onMounted(fetchEvents)
               </button>
               <button
                 @click="createEvent"
-                :disabled="!formData.descripcion"
+                :disabled="!formData.descripcion || uploading"
                 class="flex-1 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold text-lg font-['Poppins'] hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                Crear Evento ✓
+                {{ uploading ? 'Subiendo...' : 'Crear Evento ✓' }}
               </button>
             </div>
           </div>
