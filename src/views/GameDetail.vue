@@ -33,6 +33,7 @@ const fetchGameDetail = async () => {
     game.value = response.data
   } catch (error) {
     console.error('Error loading game details:', error)
+    router.replace('/404')
   } finally {
     loading.value = false
   }

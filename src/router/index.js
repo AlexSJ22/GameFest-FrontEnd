@@ -16,9 +16,9 @@ const router = createRouter({
       component: () => import('../views/GamesView.vue'),
       children: [
         {
-          path: ':id',
+          path: '/games/:id(\\d+)',
           name: 'game-detail',
-          component: () => import('../views/GameDetail.vue'),
+          component: () => import('@/views/GameDetail.vue'),
           props: true,
           meta: { skipTransition: true }
         }
@@ -30,9 +30,9 @@ const router = createRouter({
       component: () => import('../views/EventsView.vue'),
       children: [
         {
-          path: ':id',
+          path: '/events/:id(\\d+)',
           name: 'event-detail',
-          component: () => import('../views/EventDetail.vue'),
+          component: () => import('@/views/EventDetail.vue'),
           meta: { skipTransition: true },
           props: true
         }
@@ -46,7 +46,8 @@ const router = createRouter({
     {
       path: '/events/create',
       name: 'create-event',
-      component: () => import('../views/CreateEventView.vue')
+      component: () => import('../views/CreateEventView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
     {
       path: '/404',
@@ -59,16 +60,14 @@ const router = createRouter({
       redirect: '/404'
     },
     {
+      path: '/games/:id(\\d+)',
+      redirect: '/404'
+    },
+    {
       path: '/MyEvents',
       name: 'my-events',
       component: () => import('../views/MyEventsView.vue'),
       meta: { requiresAuth: true }
-    },
-    {
-      path: '/CreateEvents',
-      name: 'create-events',
-      component: () => import('../views/CreateEventView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true}
     }
   ],
 })
@@ -76,11 +75,11 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  
+
   if (authStore.loading) {
     await authStore.checkAuth()
   }
-  
+
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     return next({ name: 'home' })
   }

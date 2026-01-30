@@ -57,6 +57,7 @@ const fetchData = async () => {
 
   } catch (error) {
     console.error('Error loading data:', error)
+    router.replace('/404')
   } finally {
     loading.value = false
   }
