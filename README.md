@@ -1,46 +1,76 @@
-# frontEnd
+GameFest es una aplicación web moderna desarrollada con Vue.js 3 que permite a los usuarios explorar juegos, gestionar eventos del festival, inscribirse en actividades y mucho más. Con una interfaz atractiva y animaciones fluidas, ofrece una experiencia inmersiva para todos los amantes de los videojuegos.
 
-This template should help get you started developing with Vue 3 in Vite.
+¿Por qué GameFest?
 
-## Recommended IDE Setup
+Experiencia Visual Única: Animaciones y efectos visuales impresionantes con fondos neurales dinámicos
+Gestión Completa de Eventos: Crea, edita y administra eventos del festival
+Sistema de Autenticación: Login seguro con roles de usuario (Admin/Usuario)
+Responsive Design: Optimizado para todos los dispositivos
+Performance: Carga rápida gracias a Vite y lazy loading
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Características
 
-## Recommended Browser Setup
+Para Usuarios
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+Catálogo de Juegos: Explora la colección completa de juegos del festival
+Detalles de Juegos: Información detallada, imágenes y características
+Calendario de Eventos: Visualiza todos los eventos programados
+Inscripción a Eventos: Regístrate en talleres, charlas y competiciones
+Mis Eventos: Panel personal para gestionar tus inscripciones
+Sistema de Búsqueda: Encuentra rápidamente juegos y event
 
-## Customize configuration
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+Para Administrador
 
-## Project Setup
+Crear Eventos: Panel completo para añadir nuevos eventos
+Gestión de Participantes: Controla las inscripciones y capacidad
+Dashboard Administrativo: Vista general del festival
+Roles y Permisos: Sistema de autorización basado en roles
 
-```sh
-npm install
+Características Técnicas
 
-npm install axios
-```
+Componentes Reutilizables: Arquitectura modular y escalable
+State Management: Pinia para gestión de estado global
+Routing Avanzado: Vue Router con lazy loading y transiciones
+API REST: Integración con backend mediante Axios
+Animaciones Suaves: Transiciones y efectos visuales optimizados
+Validación de Formularios: Inputs validados en tiempo real
+Error Handling: Manejo robusto de errores con página 404 personalizada
 
-### Compile and Hot-Reload for Development
 
-```sh
-npm run dev
-```
+Tecnologías
+Core
 
-### Compile and Minify for Production
+Vue.js 3 - Framework JavaScript progresivo
+Vite - Build tool ultra-rápido
+Vue Router - Routing oficial de Vue
+Pinia - State management
 
-```sh
-npm run build
-```
+Estilos y UI
 
-### Lint with [ESLint](https://eslint.org/)
+Tailwind CSS - Framework CSS utility-first
+clsx - Utilidad para clases condicionales
+tailwind-merge - Fusión inteligente de clases Tailwind
 
-```sh
-npm run lint
-```
+HTTP y API
+
+Axios - Cliente HTTP basado en promesas
+
+Otras Dependencias
+
+Custom Components: Componentes UI personalizados (NeuralBg, MorphingText, etc.)
+Composition API: Uso extensivo de la Composition API de Vue 3
+
+
+Instalacion
+
+1. npm install
+2. npm install axios
+3. npm run dev
+
+
+Autores
+Levan Sabashvili 
+Alexis Guano  
+Aingeru Lazaro 
+Ndika'a de'e Ordiano
