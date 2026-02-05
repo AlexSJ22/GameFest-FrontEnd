@@ -1,12 +1,16 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
-import NeuralBg from '@/components/ui/bg-neural/NeuralBg.vue'
-import MorphingText from '@/components/ui/MorphingText.vue'
+// ---------------------- IMPORTACIONES ----------------------
+import { ref, onMounted } from 'vue'           // Hooks de Vue
+import { RouterLink } from 'vue-router'       // Componente para enlaces internos
+import NeuralBg from '@/components/ui/bg-neural/NeuralBg.vue' // Fondo animado neural
+import MorphingText from '@/components/ui/MorphingText.vue'  // Texto que cambia automáticamente
 
-const isLoaded = ref(false)
+// ---------------------- ESTADO REACTIVO ----------------------
+const isLoaded = ref(false)  // Controla animaciones de entrada
 
+// ---------------------- CICLO DE VIDA ----------------------
 onMounted(() => {
+  // Activamos la animación después de 100ms
   setTimeout(() => {
     isLoaded.value = true
   }, 100)
@@ -15,6 +19,8 @@ onMounted(() => {
 
 <template>
   <div class="relative h-screen overflow-hidden bg-black">
+
+    <!-- ---------------------- FONDO NEURAL ---------------------- -->
     <NeuralBg 
       :hue="240" 
       :saturation="10" 
@@ -22,26 +28,34 @@ onMounted(() => {
       class="w-full h-full blur-md"
     />
 
+    <!-- Capa de gradiente para oscurecer un poco el fondo -->
     <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black pointer-events-none"></div>
 
+    <!-- ---------------------- CONTENIDO PRINCIPAL ---------------------- -->
     <div class="relative z-10 h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div class="max-w-5xl w-full text-center space-y-8">
         
+        <!-- ---------------------- TAG DEL EVENTO ---------------------- -->
         <div 
           class="inline-block transition-all duration-700 delay-100"
           :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'"
         >
           <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-red-500/20 border border-blue-100/30 backdrop-blur-sm">
+            
+            <!-- Punto animado tipo "ping" -->
             <span class="relative flex h-2 w-2">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
             </span>
+
+            <!-- Texto del evento -->
             <span class="text-purple-200 text-sm font-['Poppins'] font-medium">
               Gaming Festival 2026
             </span>
           </div>
         </div>
 
+        <!-- ---------------------- TITULO PRINCIPAL ---------------------- -->
         <div class="space-y-4">
           <h1 
             class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold transition-all duration-700 delay-200"
@@ -53,6 +67,7 @@ onMounted(() => {
           </h1>
         </div>
 
+        <!-- ---------------------- SUBTITULO Y MORPHING TEXT ---------------------- -->
         <div 
           class="text-white/80 text-lg sm:text-xl md:text-2xl max-w-2xl mx-auto font-['mashiro'] transition-all duration-700 delay-300"
           :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
@@ -61,6 +76,7 @@ onMounted(() => {
             El festival de videojuegos más grande del año.
           </p>
           
+          <!-- Texto animado que cambia entre opciones -->
           <MorphingText 
             :texts="['Talleres', 'Charlas', 'Competiciones', 'Networking']"
             :morph-time="1.5"
@@ -69,10 +85,13 @@ onMounted(() => {
           />
         </div>
 
+        <!-- ---------------------- BOTONES DE ACCIÓN ---------------------- -->
         <div 
           class="flex flex-col sm:flex-row gap-4 justify-center items-center transition-all duration-700 delay-500"
           :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
         >
+          
+          <!-- Botón para ir a juegos -->
           <RouterLink
             to="/games"
             class="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-500 to-purple-800 text-white font-['Poppins'] font-bold text-lg overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50"
@@ -86,6 +105,7 @@ onMounted(() => {
             <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-violet-900 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </RouterLink>
 
+          <!-- Botón para ir a eventos -->
           <RouterLink
             to="/events"
             class="group px-8 py-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 text-white font-['Poppins'] font-semibold text-lg hover:bg-white/10 hover:border-white/20 transition-all"
@@ -105,6 +125,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* ---------------------- ANIMACIÓN GRADIENTE ---------------------- */
 @keyframes gradient {
   0%, 100% {
     background-size: 200% 200%;
